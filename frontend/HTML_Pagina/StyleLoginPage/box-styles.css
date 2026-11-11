@@ -428,6 +428,10 @@
 
 .newBoxTable .textoHidden,
 .newBoxTable .descricaoHidden {
+    display: block;
+    flex-basis: 100%;
+    width: 100%;
+    margin-top: 5px;
     color: var(--cor-texto);
     font-size: .75rem;
     overflow-wrap: anywhere;
@@ -526,6 +530,12 @@
 .newBoxTable .inputDescricao::placeholder {
     color: var(--cor-texto-suave);
     font-weight: 400;
+}
+
+.newBoxTable.inputDescricao:focus{
+    border: none;
+    outline: none;
+    box-shadow: none;
 }
 
 .newBoxTable .descricaoNotes {

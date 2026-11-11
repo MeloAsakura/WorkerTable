@@ -592,3 +592,4 @@ function pulsoDbClick(x, y) {
     document.body.appendChild(pulso);
     pulso.addEventListener('animationend', () => pulso.remove());
 }
+
