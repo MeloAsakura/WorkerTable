@@ -615,8 +615,6 @@ function creationPaste() {
 
         miniaturas.forEach((m) => {
             m.classList.toggle('miniaturasHidden', fechada);
-            m.classList.toggle('botaoRemoverMiniaturaHidden', fechada);
-            m.classList.toggle('buttonDescolarPastaHidden', fechada);
         });
     });
 }
