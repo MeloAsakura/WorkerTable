@@ -593,3 +593,31 @@ function pulsoDbClick(x, y) {
     pulso.addEventListener('animationend', () => pulso.remove());
 }
 
+function creationPaste() {
+    document.addEventListener('dblclick', (e) => {
+        if (e.target.closest('.miniaturaPasta, button')) return;
+
+        const p = e.target.closest('.SandBox');
+        if (!p) return;
+
+        const miniaturas = p.querySelectorAll('.miniaturaPasta');
+        if (!miniaturas.length) return;
+
+        const fechada = p.classList.toggle('fechada');
+
+        if (fechada) {
+            const pasta = document.createElement('div');
+            pasta.classList.add('pastaFechada');
+            p.append(pasta);
+        } else {
+            p.querySelector('.pastaFechada')?.remove();
+        }
+
+        miniaturas.forEach((m) => {
+            m.classList.toggle('miniaturasHidden', fechada);
+            m.classList.toggle('botaoRemoverMiniaturaHidden', fechada);
+            m.classList.toggle('buttonDescolarPastaHidden', fechada);
+        });
+    });
+}
+creationPaste()
