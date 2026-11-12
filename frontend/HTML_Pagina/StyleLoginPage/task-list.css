@@ -47,6 +47,12 @@
     user-select: none;
 
     transition: box-shadow .2s ease;
+
+    perspective: 1000px;
+    isolation: isolate;
+
+    isolation: isolate;
+
 }
 
 .SandBox:active {
@@ -54,6 +60,45 @@
 
     box-shadow: 0 4px 16px rgba(31, 38, 135, .3),
     inset 0 1px 0 rgba(255, 255, 255, .6);
+}
+
+.SandBox::before{
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    border-radius: inherit;
+    border: 1px solid rgba(255, 255, 255, .7);
+
+    background: linear-gradient(
+            135deg,
+            var(--cor-inicial, #3d64b6),
+            var(--cor-final, #769efd)
+    );
+
+    box-shadow:
+            0 5px 15px rgba(0, 0, 0, .18),
+            inset 0 1px 3px rgba(255, 255, 255, .8);
+
+
+
+    /* Ponto de articulação da tampa */
+    transform-origin: top center;
+
+    /* Posição inicial: livro aberto */
+    transform: rotateX(100deg);
+
+    backface-visibility: hidden;
+
+    transition: transform .7s cubic-bezier(.2, .75, .25, 1);
+
+    pointer-events: none;
+
+    z-index: 1;
+}
+.SandBox.fechada::before {
+    transform: rotateX(0deg);
 }
 
 @supports not (
@@ -193,12 +238,16 @@
 
     cursor: pointer;
     user-select: none;
-    touch-action: manipulation; /* toque rápido, sem zoom por duplo toque */
+    touch-action: manipulation;
 
     overflow-wrap: anywhere;    /* quebra títulos muito longos */
 
-    transition: background .2s ease,
-    transform .2s ease;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity .25s ease,
+    transform .25s ease,
+    visibility 0s linear 0s;
 }
 
 .miniaturaPasta:hover {
@@ -315,7 +364,7 @@
     transition: background .15s ease, color .15s ease, transform .15s ease;
 }
 
-/* Hover: fica vermelho e cresce um pouco */
+
 .botaoRemoverMiniatura:hover {
     background: #ef4444;
     color: #fff;
@@ -328,13 +377,11 @@
     transform: scale(1.12);
 }
 
-
-/* Clique: encolhe, dando sensação de botão pressionado */
 .botaoRemoverMiniatura,.buttonDescolarPasta:active {
     transform: scale(.9);
 }
 
-/* Acessibilidade: contorno azul ao navegar pelo teclado (Tab) */
+
 .botaoRemoverMiniatura:focus-visible {
     outline: 2px solid #3b82f6;
     outline-offset: 2px;
@@ -345,14 +392,36 @@
 .SandBox.fechada .botaoRemoverMiniatura {
     display: none;
 }
-.miniaturasPasta{
-    transition: opacity 0.1s ease-in, visibility 0.1s ;
-}
+
 
 .miniaturasHidden{
-        animation: hidden 0.1s ease-in forwards;
-        pointer-events: none;
-
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    pointer-events: none;
 }
 
 
+.miniaturasPasta.miniaturasHidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: opacity .25s ease,
+    transform .25s ease,
+    visibility 0s linear .25s;
+}
+.tituloPasta {
+    position: absolute;
+    z-index: 2;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+
+    pointer-events: none;
+}

@@ -600,10 +600,16 @@ function creationPaste() {
         const p = e.target.closest('.SandBox');
         if (!p) return;
 
+        if (!p.dataset.corGerada) {
+            colorPasta(p);
+            p.dataset.corGerada = 'true';
+        }
+
         const miniaturas = p.querySelectorAll('.miniaturaPasta');
         if (!miniaturas.length) return;
 
         const fechada = p.classList.toggle('fechada');
+
 
         if (fechada) {
             const pasta = document.createElement('div');
@@ -613,9 +619,31 @@ function creationPaste() {
             p.querySelector('.pastaFechada')?.remove();
         }
 
+        if(fechada){
+            const titulo = document.createElement('span')
+            titulo.classList.add('tituloPasta')
+            titulo.textContent='Tarefa'
+
+            p.append(titulo)
+        }else{
+            p.querySelector('.tituloPasta')?.remove();
+        }
+
         miniaturas.forEach((m) => {
             m.classList.toggle('miniaturasHidden', fechada);
         });
     });
 }
 creationPaste()
+
+function colorPasta(pasta){
+    let r= Math.floor(Math.random()*256)
+    let g= Math.floor(Math.random()*256)
+    let b= Math.floor(Math.random()*256)
+
+    let corInicial =`rgb(${r}, ${g}, ${b})`;
+    let corFinal = `rgb(${Math.min(r + 50, 255)}, ${Math.min(g + 50, 255)}, ${Math.min(b + 50, 255)})`;
+
+    pasta.style.setProperty('--cor-inicial', corInicial);
+    pasta.style.setProperty('--cor-final', corFinal);
+}

@@ -342,7 +342,6 @@
     opacity: 1;
     margin-top: 6px;
 }
-
 .newBoxTable .acaoItem {
     flex: none;
     height: 28px;
@@ -366,6 +365,16 @@
     background: var(--cor-primaria-suave);
     color: var(--cor-primaria);
 }
+
+.newBoxTable .acaoItem:focus {
+    outline: none;
+}
+
+.newBoxTable .acaoItem:focus-visible {
+    outline: 2px solid var(--cor-primaria);
+    outline-offset: -2px;
+}
+/* ============================================================== */
 
 .newBoxTable .acaoItem svg {
     width: 16px;
