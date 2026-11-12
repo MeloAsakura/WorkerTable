@@ -20,14 +20,14 @@ areaTables.addEventListener('click', () => {
         clone.classList.toggle('aberta');
     });
 
-    pastas.set(clone.id = contPastas++,clone)
+    pastas.set(clone.id = contPastas++, clone)
 });
 
 
 function pastaSobreposta(box) {
     const rect = box.getBoundingClientRect();
 
-    for(const [id,pasta] of pastas){
+    for (const [id, pasta] of pastas) {
         const limite = pasta.getBoundingClientRect();
 
         const sobreP =
@@ -36,13 +36,12 @@ function pastaSobreposta(box) {
             rect.top < limite.bottom &&
             rect.bottom > limite.top;
 
-        if(sobreP){
+        if (sobreP) {
             return pasta
         }
     }
     return null;
 }
-
 
 
 document.addEventListener('pointerup', (e) => {
@@ -104,14 +103,14 @@ function styleMiniatura(box, pasta) {
     });
 
     const descolarPasta = document.createElement('button')
-    descolarPasta.type='button'
+    descolarPasta.type = 'button'
     descolarPasta.classList.add('buttonDescolarPasta')
     descolarPasta.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M19 3l-7 7"/><path d="M8 18H4v-6"/><path d="M4 18l7-7"/></svg>'
-    descolarPasta.addEventListener('click',(e)=>{
+    descolarPasta.addEventListener('click', (e) => {
         e.stopPropagation()
 
         const arm = box.closest('.armazenamentoPasta')
-        if(!arm) return
+        if (!arm) return
 
         box.classList.remove('expandida')
 
@@ -123,7 +122,7 @@ function styleMiniatura(box, pasta) {
     })
 
 
-    botoesMiniatura.append(miniatura, botaoremoverminiatura,descolarPasta)
+    botoesMiniatura.append(miniatura, botaoremoverminiatura, descolarPasta)
     containerMiniaturas.appendChild(botoesMiniatura);
 }
 
@@ -135,9 +134,9 @@ function miniaturaClicada() {
         if (!miniatura) return;
 
         let pastaEncontrada = null;
-        for(const [idPasta , pasta] of pastas){
-            if(pasta.contains(miniatura)){
-                pastaEncontrada=pasta;
+        for (const [idPasta, pasta] of pastas) {
+            if (pasta.contains(miniatura)) {
+                pastaEncontrada = pasta;
                 break;
             }
         }
@@ -494,10 +493,10 @@ function configurarGestoSuperior(box) {
 
     document.addEventListener('keydown', (e) => {
         const box = e.target.closest('.newBoxTable')
-        if(!box)return
+        if (!box) return
 
         if (e.key === 'Escape' || e.key === 'Delete') {
-           cancelar();
+            cancelar();
         }
     });
 
@@ -505,6 +504,7 @@ function configurarGestoSuperior(box) {
 }
 
 const anotacoes = new Map;
+
 function anotacoesLivres(box) {
     const id = box.idBox;
     if (!box.classList.contains('comGuia')) return
@@ -593,55 +593,53 @@ function pulsoDbClick(x, y) {
     pulso.addEventListener('animationend', () => pulso.remove());
 }
 
-function creationPaste() {
-    document.addEventListener('dblclick', (e) => {
-        if (e.target.closest('.miniaturaPasta, button')) return;
+// function creationPaste() {
+//     document.addEventListener('dblclick', (e) => {
+//         if (e.target.closest('.miniaturaPasta, button')) return;
+//
+//         const p = e.target.closest('.SandBox');
+//         if (!p) return;
+//
+//         if (!p.dataset.corGerada) {
+//             colorPasta(p);
+//             p.dataset.corGerada = 'true';
+//         }
+//
+//         const miniaturas = p.querySelectorAll('.miniaturaPasta');
+//         if (!miniaturas.length) return;
+//
+//         const fechada = p.classList.toggle('fechada');
+//
+//         let inputNomePasta = p.querySelector('.inputNomePasta');
+//         if(!inputNomePasta){
+//
+//             inputNomePasta = document.createElement('input')
+//             inputNomePasta.classList.add('inputNomePasta')
+//             inputNomePasta.type = 'text'
+//             inputNomePasta.value = p.dataset.nomePasta || '';
+//
+//             inputNomePasta.addEventListener('input', () => {
+//                 p.dataset.nomePasta = inputNomePasta.value
+//             })
+//         }
+//         p.append(inputNomePasta);
+//
+//         inputNomePasta.style.display=fechada ? 'block' : 'none';
+//
+//         miniaturas.forEach((m) => {
+//             m.classList.toggle('miniaturasHidden', fechada);
+//         });
+//     });
+// }
+//
+// creationPaste()
 
-        const p = e.target.closest('.SandBox');
-        if (!p) return;
+function colorPasta(pasta) {
+    let r = Math.floor(Math.random() * 256)
+    let g = Math.floor(Math.random() * 256)
+    let b = Math.floor(Math.random() * 256)
 
-        if (!p.dataset.corGerada) {
-            colorPasta(p);
-            p.dataset.corGerada = 'true';
-        }
-
-        const miniaturas = p.querySelectorAll('.miniaturaPasta');
-        if (!miniaturas.length) return;
-
-        const fechada = p.classList.toggle('fechada');
-
-
-        if (fechada) {
-            const pasta = document.createElement('div');
-            pasta.classList.add('pastaFechada');
-            p.append(pasta);
-        } else {
-            p.querySelector('.pastaFechada')?.remove();
-        }
-
-        if(fechada){
-            const titulo = document.createElement('span')
-            titulo.classList.add('tituloPasta')
-            titulo.textContent='Tarefa'
-
-            p.append(titulo)
-        }else{
-            p.querySelector('.tituloPasta')?.remove();
-        }
-
-        miniaturas.forEach((m) => {
-            m.classList.toggle('miniaturasHidden', fechada);
-        });
-    });
-}
-creationPaste()
-
-function colorPasta(pasta){
-    let r= Math.floor(Math.random()*256)
-    let g= Math.floor(Math.random()*256)
-    let b= Math.floor(Math.random()*256)
-
-    let corInicial =`rgb(${r}, ${g}, ${b})`;
+    let corInicial = `rgb(${r}, ${g}, ${b})`;
     let corFinal = `rgb(${Math.min(r + 50, 255)}, ${Math.min(g + 50, 255)}, ${Math.min(b + 50, 255)})`;
 
     pasta.style.setProperty('--cor-inicial', corInicial);

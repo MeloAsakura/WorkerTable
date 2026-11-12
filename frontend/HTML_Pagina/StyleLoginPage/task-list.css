@@ -411,17 +411,39 @@
     transform .25s ease,
     visibility 0s linear .25s;
 }
-.tituloPasta {
+
+.inputNomePasta {
     position: absolute;
     z-index: 2;
+    top: 35%;
+    left: 12%;
+    right: 50px;
+    width: calc(100% - 75px);
+    box-sizing: border-box;
 
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #ffffff;
+    border-radius: 0px;
+    outline: none;
+    text-align: center;
+    -webkit-appearance: none;
+}
 
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
+.inputNomePasta:focus,
+.inputNomePasta:focus-visible,
+.SandBox.fechada .inputNomePasta:focus,
+.SandBox.fechada .inputNomePasta:focus-visible {
+    border: none !important;
+    border-bottom: 1px solid #ffffff !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
 
-    pointer-events: none;
+.SandBox.fechada .inputNomePasta {
+    display: block;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    border-bottom: 1px solid #ffffff;
 }
