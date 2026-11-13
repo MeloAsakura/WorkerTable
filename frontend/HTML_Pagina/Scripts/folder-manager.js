@@ -593,55 +593,85 @@ function pulsoDbClick(x, y) {
     pulso.addEventListener('animationend', () => pulso.remove());
 }
 
-// function creationPaste() {
-//     document.addEventListener('dblclick', (e) => {
-//         if (e.target.closest('.miniaturaPasta, button')) return;
-//
-//         const p = e.target.closest('.SandBox');
-//         if (!p) return;
-//
-//         if (!p.dataset.corGerada) {
-//             colorPasta(p);
-//             p.dataset.corGerada = 'true';
-//         }
-//
-//         const miniaturas = p.querySelectorAll('.miniaturaPasta');
-//         if (!miniaturas.length) return;
-//
-//         const fechada = p.classList.toggle('fechada');
-//
-//         let inputNomePasta = p.querySelector('.inputNomePasta');
-//         if(!inputNomePasta){
-//
-//             inputNomePasta = document.createElement('input')
-//             inputNomePasta.classList.add('inputNomePasta')
-//             inputNomePasta.type = 'text'
-//             inputNomePasta.value = p.dataset.nomePasta || '';
-//
-//             inputNomePasta.addEventListener('input', () => {
-//                 p.dataset.nomePasta = inputNomePasta.value
-//             })
-//         }
-//         p.append(inputNomePasta);
-//
-//         inputNomePasta.style.display=fechada ? 'block' : 'none';
-//
-//         miniaturas.forEach((m) => {
-//             m.classList.toggle('miniaturasHidden', fechada);
-//         });
-//     });
-// }
-//
-// creationPaste()
+
+ function creationPaste() {
+     document.addEventListener('dblclick', (e) => {
+         if (e.target.closest('.miniaturaPasta, button')) return;
+
+         const p = e.target.closest('.SandBox');
+         if (!p) return;
+
+         if (!p.dataset.corGerada) {
+             colorPasta(p);
+             p.dataset.corGerada = 'true';
+         }
+
+         const miniaturas = p.querySelectorAll('.miniaturaPasta');
+         if (!miniaturas.length) return;
+
+         const fechada = p.classList.toggle('fechada');
+
+         let inputNomePasta = p.querySelector('.inputNomePasta');
+         if(!inputNomePasta){
+
+             inputNomePasta = document.createElement('input')
+             inputNomePasta.classList.add('inputNomePasta')
+             inputNomePasta.type = 'text'
+             inputNomePasta.value = p.dataset.nomePasta || '';
+
+             inputNomePasta.addEventListener('input', () => {
+                 p.dataset.nomePasta = inputNomePasta.value
+             })
+         }
+         p.append(inputNomePasta);
+
+         inputNomePasta.style.display=fechada ? 'block' : 'none';
+         colorText(inputNomePasta,p)
+
+         miniaturas.forEach((m) => {
+             m.classList.toggle('miniaturasHidden', fechada);
+         });
+     });
+ }
+ creationPaste()
+
+
 
 function colorPasta(pasta) {
     let r = Math.floor(Math.random() * 256)
     let g = Math.floor(Math.random() * 256)
     let b = Math.floor(Math.random() * 256)
 
-    let corInicial = `rgb(${r}, ${g}, ${b})`;
-    let corFinal = `rgb(${Math.min(r + 50, 255)}, ${Math.min(g + 50, 255)}, ${Math.min(b + 50, 255)})`;
+    const r2 = Math.min(r + 50, 255);
+    const g2 = Math.min(g + 50, 255);
+    const b2 = Math.min(b + 50, 255);
 
-    pasta.style.setProperty('--cor-inicial', corInicial);
-    pasta.style.setProperty('--cor-final', corFinal);
+    pasta.style.setProperty('--cor-inicial', `rgb(${r}, ${g}, ${b})`);
+    pasta.style.setProperty('--cor-final', `rgb(${r2}, ${g2}, ${b2})`);
+
+    const luminancia =
+        0.299 * ((r + r2) / 2) +
+        0.587 * ((g + g2) / 2) +
+        0.114 * ((b + b2) / 2);
+
+    pasta.dataset.luminancia = luminancia;
 }
+function colorText(texto,pasta){
+    const luminancia = Number(pasta.dataset.luminancia);
+
+    texto.style.color = luminancia < 128
+        ? 'rgb(255, 255, 255)'
+        : 'rgb(0, 0, 0)';
+
+}
+function outsiderBox(){
+    let lz= 1
+
+    document.addEventListener('mousedown',(e)=>{
+        const p = e.target.closest('.SandBox,.newBoxTable');
+        if(!p) return
+
+        p.style.zIndex=++lz
+    })
+}
+outsiderBox()
