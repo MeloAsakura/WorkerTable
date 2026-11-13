@@ -213,12 +213,25 @@ function alternarOpcoes(textoTopo, botaoOpcoes) {
 
 // Configura o botão de opções
 function configurarOpcoes(elementos) {
-    const { botaoOpcoes, areaAcoes } = elementos;
+    const { botaoOpcoes, areaAcoes, li } = elementos;
     botaoOpcoes.setAttribute('aria-expanded', 'false');
-    botaoOpcoes.addEventListener('click', () => {
+    botaoOpcoes.addEventListener('click', (e) => {
+        e.stopPropagation();
         alternarOpcoes(areaAcoes.parentElement, botaoOpcoes);
     });
 }
+
+// Fecha todos os dropdowns abertos ao clicar fora
+document.addEventListener('click', (e) => {
+    // Fecha dropdowns de ações
+    document.querySelectorAll('.textoTopo.opcoes-abertas').forEach(textoTopo => {
+        if (!textoTopo.contains(e.target)) {
+            textoTopo.classList.remove('opcoes-abertas');
+            const botao = textoTopo.querySelector('.buttonOpcoes');
+            if (botao) botao.setAttribute('aria-expanded', 'false');
+        }
+    });
+});
 
 // Adiciona a tarefa ao final da lista
 function adicionarTarefaNaLista(tarefa,lista) {

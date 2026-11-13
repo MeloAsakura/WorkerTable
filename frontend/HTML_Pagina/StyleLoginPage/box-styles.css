@@ -288,17 +288,21 @@
 
 /*==================== Botão de opções ====================*/
 
+/* O botão de opções abre um menu dropdown flutuante (popover) com as ações. */
+
 .newBoxTable .buttonOpcoes {
     flex: none;
+    flex-shrink: 0;
+    margin-left: auto;
     width: 28px;
-    height: 15px;
+    height: 28px;
     padding: 0 2px;
     border: none;
     border-radius: 6px;
     background: transparent;
     color: var(--cor-texto-suave);
     cursor: pointer;
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
     transition: color .15s ease, background-color .15s ease, transform .15s ease;
@@ -318,47 +322,57 @@
     pointer-events: none;
 }
 
-/*==================== Ações da tarefa ====================*/
+/*==================== Ações da tarefa (Dropdown / Popover) ====================*/
 
-.newBoxTable .acoes {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    margin-left: auto;
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition:
-            max-height .3s ease,
-            opacity .25s ease,
-            margin-top .3s ease,
-            padding .3s ease;
+/* O container .textoTopo precisa ser o referencial de posição para o dropdown */
+.newBoxTable .textoTopo {
+    position: relative;
 }
 
+.newBoxTable .acoes {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px;
+    min-width: 180px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .12), 0 1px 4px rgba(0, 0, 0, .08);
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-6px) scale(.96);
+    transform-origin: top right;
+    transition: opacity .15s ease, transform .2s ease;
+}
+
+/* Dropdown aberto */
 .newBoxTable .textoTopo.opcoes-abertas .acoes {
-    max-height: 200px;
-    padding: 4px 2px;
+    pointer-events: auto;
     opacity: 1;
-    margin-top: 6px;
+    transform: translateY(0) scale(1);
 }
 .newBoxTable .acaoItem {
     flex: none;
-    height: 28px;
-    min-width: 28px;
-    padding: 0 9px;
-    border: 1px solid rgba(0, 0, 0, .1);
+    width: 100%;
+    height: 36px;
+    padding: 0 10px;
+    border: none;
     border-radius: 8px;
     background: transparent;
     color: var(--cor-texto);
-    font-size: .75rem;
+    font-size: .82rem;
     font-weight: 500;
-    line-height: 5;
+    text-align: left;
     cursor: pointer;
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 6px;
-    transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+    gap: 8px;
+    transition: background-color .12s ease, color .12s ease;
 }
 
 .newBoxTable .acaoItem:hover {
@@ -380,7 +394,12 @@
     width: 16px;
     height: 16px;
     flex-shrink: 0;
+    color: var(--cor-texto-suave);
     pointer-events: none;
+}
+
+.newBoxTable .acaoItem:hover svg {
+    color: inherit;
 }
 
 .newBoxTable .acaoItem[aria-expanded="true"] {
@@ -400,29 +419,21 @@
 }
 
 .newBoxTable .acaoDivisor {
-    width: 1px;
-    height: 20px;
+    width: 100%;
+    height: 1px;
     background: var(--cor-borda);
-    margin: 0 2px;
+    margin: 4px 0;
     flex-shrink: 0;
 }
 
-/* Container query: quando a box estiver em torno de 400px */
-@container (max-width: 400px) {
-    .newBoxTable .acoes {
+/* Container query: quando a box estiver em torno de 433px */
+@container (max-width: 433px) {
+    .newBoxTable .textoTopo {
         flex-wrap: nowrap;
-        gap: 2px;
     }
-    .newBoxTable .acaoItem span {
-        display: none;
-    }
-    .newBoxTable .acaoItem {
-        padding: 0 6px;
-        width: 30px;
-        justify-content: center;
-    }
-    .newBoxTable .acaoDivisor {
-        display: none;
+    .newBoxTable .buttonOpcoes {
+        margin-left: auto;
+        flex-shrink: 0;
     }
 }
 
