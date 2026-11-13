@@ -676,6 +676,8 @@
     height: 100%;
     box-sizing: border-box;
     z-index: 2;
+
+    padding:0 1.8px 0 0
 }
 
 .blocoDeAnotacoes {
@@ -686,7 +688,7 @@
     width: 100%;
     height: 100%;
     box-sizing: border-box;
-    padding: 0 8px;
+    padding: 0 16px 0 8px;
     border: none;
     outline: none;
     resize: none;
@@ -704,11 +706,6 @@
             var(--cor-linha) calc(var(--altura-linha) - 1px),
             var(--cor-linha) var(--altura-linha)
     );
-
-    background-size: 100% var(--altura-linha);
-    background-repeat: repeat-y;
-
-    animation: surgirLinhas 0.5s forwards;
 }
 
 @keyframes surgirLinhas {
@@ -722,25 +719,27 @@
 
 }
 
-.divBloco::-webkit-scrollbar {
-    width: 4px;
+.blocoDeAnotacoes::-webkit-scrollbar {
+    width: 6px;
 }
 
-.divBloco::-webkit-scrollbar-track {
+.blocoDeAnotacoes::-webkit-scrollbar-track {
     background: transparent;
+    margin-top: 8px;
+    margin-bottom: 8px;
 }
 
-.divBloco::-webkit-scrollbar-thumb {
+.blocoDeAnotacoes::-webkit-scrollbar-thumb {
     border-radius: 999px;
     background: rgba(47, 84, 184, .3);
 }
 
-.divBloco::-webkit-scrollbar-thumb:hover {
+.blocoDeAnotacoes::-webkit-scrollbar-thumb:hover {
     background: rgba(47, 84, 184, .5);
 }
 
-.divBloco:hover,
-.divBloco:focus {
+.blocoDeAnotacoes:hover,
+.blocoDeAnotacoes:focus {
     border: none;
     outline: none;
 }

@@ -596,7 +596,7 @@ function pulsoDbClick(x, y) {
 
  function creationPaste() {
      document.addEventListener('dblclick', (e) => {
-         if (e.target.closest('.miniaturaPasta, button')) return;
+         if (e.target.closest('.miniaturaPasta,.newBoxTable, button')) return;
 
          const p = e.target.closest('.SandBox');
          if (!p) return;

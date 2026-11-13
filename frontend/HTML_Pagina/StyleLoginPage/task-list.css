@@ -276,21 +276,22 @@
 /* Box guardada que foi aberta ao clicar na miniatura:
    aparece ao lado direito da SandBox */
 .armazenamentoPasta .newBoxTable.expandida {
-    display: block;
-    position: absolute;
+   display: block;
+   position: absolute;
 
-    top: 0;
-    left: calc(100% + 12px); /* 100% da SandBox + 12px de folga */
+   top: 0;
+   left: calc(100% + 12px); /* 100% da SandBox + 12px de folga */
 
-    width: 320px;
-    height: 240px;
-    max-height: none;
+   width: 320px;
+   height: 400px;
+   max-height: none;
 
-    padding: 16px;
-    box-sizing: border-box;
+   padding: 16px;
+   box-sizing: border-box;
 
-    z-index: 10;             /* fica acima das outras boxes */
-    cursor: grab;
+   z-index: 10;
+   cursor: grab;
+   overflow:hidden;
 }
 
 
