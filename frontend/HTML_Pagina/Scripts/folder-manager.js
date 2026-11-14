@@ -675,3 +675,23 @@ function outsiderBox(){
     })
 }
 outsiderBox()
+
+function deleteSandBox() {
+    const ladoDir = document.getElementById('ladoDir')
+    if (!ladoDir) return
+
+    document.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.miniaturasPasta, button')) return
+
+        const sandBox = e.target.closest('.SandBox')
+        if (!sandBox) return
+
+        ladoDir.querySelector('.buttonRemoverSandBox')?.remove()
+
+        const remove = document.createElement('div')
+        remove.classList.add('buttonRemoverSandBox')
+
+    })
+}
+
+deleteSandBox()

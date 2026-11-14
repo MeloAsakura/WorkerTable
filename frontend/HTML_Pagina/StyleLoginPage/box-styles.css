@@ -291,6 +291,7 @@
 /* O botão de opções abre um menu dropdown flutuante (popover) com as ações. */
 
 .newBoxTable .buttonOpcoes {
+    anchor-name: --opcoes;
     flex: none;
     flex-shrink: 0;
     margin-left: auto;
@@ -325,14 +326,24 @@
 /*==================== Ações da tarefa (Dropdown / Popover) ====================*/
 
 /* O container .textoTopo precisa ser o referencial de posição para o dropdown */
+
+.newBoxTable .textoTopo { anchor-scope: --opcoes; }
+.newBoxTable .buttonOpcoes { anchor-name: --opcoes; }
+
+
 .newBoxTable .textoTopo {
-    position: relative;
+    anchor-scope: --opcoes;
+    z-index: 1;
 }
 
 .newBoxTable .acoes {
-    position: absolute;
-    top: calc(100% + 4px);
-    right: 0;
+    position: fixed;
+    position-anchor: --opcoes;
+    top: calc(anchor(bottom) + 4px); /* logo abaixo do botão */
+    right: anchor(right);            /* alinhado à direita do botão */
+    position-visibility: anchors-visible;
+    position: fixed;
+
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -342,7 +353,6 @@
     border-radius: 10px;
     background: #fff;
     box-shadow: 0 4px 16px rgba(0, 0, 0, .12), 0 1px 4px rgba(0, 0, 0, .08);
-    z-index: 100;
     pointer-events: none;
     opacity: 0;
     transform: translateY(-6px) scale(.96);
@@ -355,6 +365,7 @@
     pointer-events: auto;
     opacity: 1;
     transform: translateY(0) scale(1);
+    z-index:100;
 }
 .newBoxTable .acaoItem {
     flex: none;
