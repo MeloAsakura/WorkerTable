@@ -448,3 +448,84 @@
     box-shadow: none;
     border-bottom: 1px solid #ffffff;
 }
+
+.buttonRemoverSandBox{
+    position: fixed;
+    left: 50%;
+    top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 99px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+
+    opacity: .6;
+    transform: scale(.9);
+
+    transition:
+            opacity .25s ease,
+            transform .25s ease,
+            background .25s ease,
+            box-shadow .25s ease;
+}
+
+.buttonRemoverSandBox::before{
+    content: "";
+
+    position: absolute;
+    inset: -12px;
+
+    border: 2px dashed rgba(255,70,70,.8);
+    border-radius: 50%;
+
+    opacity: 0;
+    transform: scale(.7);
+
+    transition: .25s ease;
+    pointer-events: none;
+}
+
+.buttonRemoverSandBox::after {
+    position: absolute;
+    bottom: 75px;
+
+    white-space: nowrap;
+
+    padding: 6px 12px;
+    border-radius: 8px;
+
+    background: rgba(30,30,30,.85);
+    color: white;
+
+    opacity: 0;
+    transform: translateY(8px);
+
+    transition: .25s ease;
+    pointer-events: none;
+}
+
+.buttonRemoverSandBox.areaAtiva {
+    opacity: 1;
+    transform: scale(1.15);
+
+    background: rgba(220,40,40,.75);
+
+    box-shadow: 0 0 20px rgba(255,0,0,.4);
+}
+
+.buttonRemoverSandBox.areaAtiva::before {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.buttonRemoverSandBox.areaAtiva::after {
+    opacity: 1;
+    transform: translateY(0);
+}

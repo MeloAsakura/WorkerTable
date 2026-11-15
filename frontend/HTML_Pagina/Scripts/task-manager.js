@@ -5,8 +5,6 @@ const listaTarefa = document.querySelector('.listaDeTarefas');
 const buttonAddTarefa = document.querySelector('.buttonAdicionar');
 
 
-
-
 // Cria uma tarefa e coordena suas configurações
 function criarTarefa(titulo, lista) {
     titulo = titulo.trim();
@@ -24,6 +22,7 @@ function criarTarefa(titulo, lista) {
     configurarNotes(elementos);
     configurarDatas(elementos);
     configurarOpcoes(elementos);
+    configurarHorario(elementos)
 
     adicionarTarefaNaLista(tarefa, lista);
 }
@@ -47,7 +46,8 @@ function obterElementosTarefa(li) {
         areaDatas: li.querySelector('.datasInicioeFim'),
         dataInicio: li.querySelector('.dataInicio'),
         dataFim: li.querySelector('.dataFim'),
-        resumoDatas: li.querySelector('.textoHidden')
+        resumoDatas: li.querySelector('.textoHidden'),
+        horario: li.querySelector('.horario')
     };
 }
 
@@ -220,6 +220,12 @@ function configurarOpcoes(elementos) {
         alternarOpcoes(areaAcoes.parentElement, botaoOpcoes);
     });
 }
+
+function configurarHorario(elemento){
+    const horario= elemento
+
+}
+
 
 // Fecha todos os dropdowns abertos ao clicar fora
 document.addEventListener('click', (e) => {

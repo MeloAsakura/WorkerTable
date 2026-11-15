@@ -681,17 +681,67 @@ function deleteSandBox() {
     if (!ladoDir) return
 
     document.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.miniaturasPasta, button')) return
+        if (e.target.closest('.newBoxTable,button')) return
 
         const sandBox = e.target.closest('.SandBox')
         if (!sandBox) return
+
 
         ladoDir.querySelector('.buttonRemoverSandBox')?.remove()
 
         const remove = document.createElement('div')
         remove.classList.add('buttonRemoverSandBox')
+        remove.textContent='x'
+        ladoDir.append(remove)
 
-    })
+        function sobreposto(cx1 , cx2){
+
+            const LIMITE = 35
+
+            const sobre = (
+                cx1.left >= cx2.right +LIMITE ||
+                cx1.right<= cx2.left -LIMITE ||
+                cx1.bottom<=cx2.top  -LIMITE ||
+                cx1.top>=cx2.bottom +LIMITE
+            );
+            return !sobre
+        }
+
+        function attAreaRemocao(){
+
+            const rect = sandBox.getBoundingClientRect()
+            const rectRemove =  remove .getBoundingClientRect();
+
+            const sob = sobreposto(rect,rectRemove)
+
+            remove.classList.toggle('areaAtiva',sob)
+
+            return sob;
+        }
+        let arrast = false
+        function acompanharMouse() {
+            arrast=true
+            attAreaRemocao();
+        }
+
+        function finalizarRemocao() {
+
+            const remover = arrast && attAreaRemocao();
+
+            document.removeEventListener('mousemove', acompanharMouse);
+            document.removeEventListener('mouseup', finalizarRemocao);
+
+            remove.remove();
+
+            if (remover) {
+                sandBox.remove();
+                pastas.delete(sandBox.id)
+
+            }
+        }
+        document.addEventListener('mousemove', acompanharMouse);
+        document.addEventListener('mouseup', finalizarRemocao);
+
+    });
 }
-
 deleteSandBox()

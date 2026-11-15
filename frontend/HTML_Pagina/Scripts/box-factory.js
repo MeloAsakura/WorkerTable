@@ -4,6 +4,8 @@ const buttonAddBox = document.getElementById('btnAdd');
 
 let contidBox = 0
 
+
+
 function criarBox() {
     const clone = cloneTemplate.content.cloneNode(true);
 
