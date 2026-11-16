@@ -1,4 +1,3 @@
-
 const nomeTarefa = document.getElementById('nomeTarefa');
 const modeloTarefa = document.getElementById('modeloTarefa');
 const listaTarefa = document.querySelector('.listaDeTarefas');
@@ -22,7 +21,7 @@ function criarTarefa(titulo, lista) {
     configurarNotes(elementos);
     configurarDatas(elementos);
     configurarOpcoes(elementos);
-    configurarHorario(elementos)
+    configuracaoBotaoTimer(elementos)
 
     adicionarTarefaNaLista(tarefa, lista);
 }
@@ -41,6 +40,10 @@ function obterElementosTarefa(li) {
         areaNotes: li.querySelector('.descricaoNotes'),
         inputNotes: li.querySelector('.inputDescricao'),
         resumoNotes: li.querySelector('.descricaoHidden'),
+
+        botaoTimer: li.querySelector('.buttonTimer'),
+        tipoTimer:li.querySelector('.tipoTimer'),
+        timerPomodoro: li.querySelector('.opcaoPomodoro'),
 
         botaoData: li.querySelector('.buttonData'),
         areaDatas: li.querySelector('.datasInicioeFim'),
@@ -79,7 +82,7 @@ function configurarConclusao(elementos) {
 
 // Configura a área de descrição da tarefa
 function configurarNotes(elementos) {
-    const { botaoNotes, areaNotes, inputNotes, resumoNotes } = elementos;
+    const {botaoNotes, areaNotes, inputNotes, resumoNotes} = elementos;
 
     botaoNotes.setAttribute('aria-expanded', 'false');
 
@@ -129,7 +132,7 @@ function atualizarResumoNotes(input, resumo) {
 
 // Configura os campos de data
 function configurarDatas(elementos) {
-    const { dataInicio, dataFim, botaoData, areaDatas } = elementos;
+    const {dataInicio, dataFim, botaoData, areaDatas} = elementos;
 
     botaoData.addEventListener('click', () => {
         alternarDatas(areaDatas, botaoData);
@@ -160,7 +163,7 @@ function alternarDatas(area, botao) {
 
 // Atualiza o resumo das datas escolhidas
 function atualizarResumoDatas(elementos) {
-    const { dataInicio, dataFim, resumoDatas } = elementos;
+    const {dataInicio, dataFim, resumoDatas} = elementos;
 
     const inicio = dataInicio.value.trim();
     const fim = dataFim.value.trim();
@@ -175,6 +178,22 @@ function atualizarResumoDatas(elementos) {
     resumoDatas.hidden = false;
 }
 
+function configuracaoBotaoTimer(elementos) {
+    const {botaoTimer,tipoTimer ,timerPomodoro} = elementos
+
+    botaoTimer.addEventListener('click', () => {
+        const vaiAbrir = tipoTimer.hidden
+        tipoTimer.hidden = !vaiAbrir;
+
+        tipoTimer.style.width='20px'
+        tipoTimer.style.height='20px'
+        tipoTimer.style.background='black'
+
+        console.log('abrir caixa')
+    })
+
+
+}
 
 function editarNomeTarefa(li) {
     const liNomeTarefa = li.querySelector('.textoTitulo');
@@ -195,11 +214,11 @@ function editarNomeTarefa(li) {
         if (e.key === 'Enter') finalizar();
     });
 
-    inputNovoNome.addEventListener('blur', finalizar, { once: true });
+    inputNovoNome.addEventListener('blur', finalizar, {once: true});
 }
 
-function configurarNomeTarefa(elemento){
-    elemento.titulo.addEventListener('dblclick',()=>{
+function configurarNomeTarefa(elemento) {
+    elemento.titulo.addEventListener('dblclick', () => {
         editarNomeTarefa(elemento.li)
     })
 }
@@ -213,19 +232,13 @@ function alternarOpcoes(textoTopo, botaoOpcoes) {
 
 // Configura o botão de opções
 function configurarOpcoes(elementos) {
-    const { botaoOpcoes, areaAcoes, li } = elementos;
+    const {botaoOpcoes, areaAcoes, li} = elementos;
     botaoOpcoes.setAttribute('aria-expanded', 'false');
     botaoOpcoes.addEventListener('click', (e) => {
         e.stopPropagation();
         alternarOpcoes(areaAcoes.parentElement, botaoOpcoes);
     });
 }
-
-function configurarHorario(elemento){
-    const horario= elemento
-
-}
-
 
 // Fecha todos os dropdowns abertos ao clicar fora
 document.addEventListener('click', (e) => {
@@ -240,7 +253,7 @@ document.addEventListener('click', (e) => {
 });
 
 // Adiciona a tarefa ao final da lista
-function adicionarTarefaNaLista(tarefa,lista) {
+function adicionarTarefaNaLista(tarefa, lista) {
     lista.appendChild(tarefa);
 }
 
