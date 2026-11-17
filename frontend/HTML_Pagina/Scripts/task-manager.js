@@ -41,9 +41,8 @@ function obterElementosTarefa(li) {
         inputNotes: li.querySelector('.inputDescricao'),
         resumoNotes: li.querySelector('.descricaoHidden'),
 
-        botaoTimer: li.querySelector('.buttonTimer'),
+        buttonTimer: li.querySelector('.buttonTimer'),
         tipoTimer:li.querySelector('.tipoTimer'),
-        timerPomodoro: li.querySelector('.opcaoPomodoro'),
 
         botaoData: li.querySelector('.buttonData'),
         areaDatas: li.querySelector('.datasInicioeFim'),
@@ -179,15 +178,11 @@ function atualizarResumoDatas(elementos) {
 }
 
 function configuracaoBotaoTimer(elementos) {
-    const {botaoTimer,tipoTimer ,timerPomodoro} = elementos
+    const {buttonTimer,tipoTimer } = elementos
 
-    botaoTimer.addEventListener('click', () => {
-        const vaiAbrir = tipoTimer.hidden
-        tipoTimer.hidden = !vaiAbrir;
-
-        tipoTimer.style.width='20px'
-        tipoTimer.style.height='20px'
-        tipoTimer.style.background='black'
+    buttonTimer.addEventListener('click', () => {
+        const aberto = tipoTimer.classList.toggle(`aberto`)
+        buttonTimer.setAttribute('aria-expanded', aberto);
 
         console.log('abrir caixa')
     })

@@ -138,27 +138,40 @@
                         </svg>
                     </button>
 
-                    <button type="button" class="buttonTimer" aria-expanded="false" title="Timer">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             width="20"
-                             height="20"
-                             viewBox="0 0 24 24"
-                             fill="none"
-                             stroke="currentColor"
-                             stroke-width="2.5"
-                             stroke-linecap="round"
-                             stroke-linejoin="round">
+                    <div class="containerTimer">
 
-                            <path d="M5 12l5 5L20 7"></path>
+                        <button type="button" class="buttonTimer"
+                                aria-expanded="false" title="Timer">
 
-                        </svg>
-                    </button>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 width="16" height="16"
+                                 viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round">
 
-                    <div class="tipoTimer" hidden>
-                        <div class="timerPomorodo">
-                            <button type="button" class="opcaoPomodoro">POMODORO</button>
-                            <span>CONTADOR</span>
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+
+                        </button>
+
+                        <div class="tipoTimer" >
+                            <div class="timerPomorodo">
+                                <button type="button" class="opcaoPomodoro">
+                                    Pomodoro
+                                </button>
+                            </div>
+
+                            <div class="horaMarcada">
+                                <button type="button" class="timerHora">
+                                    Hora
+                                </button>
+                            </div>
                         </div>
+
                     </div>
 
                     <div class="acoes">
