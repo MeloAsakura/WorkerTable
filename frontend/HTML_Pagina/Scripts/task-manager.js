@@ -21,7 +21,9 @@ function criarTarefa(titulo, lista) {
     configurarNotes(elementos);
     configurarDatas(elementos);
     configurarOpcoes(elementos);
-    configuracaoBotaoTimer(elementos)
+    configuracaoBotaoTimer(elementos);
+    opcaoDeTimer(elementos);
+    criarPomodoro(elementos)
 
     adicionarTarefaNaLista(tarefa, lista);
 }
@@ -42,7 +44,9 @@ function obterElementosTarefa(li) {
         resumoNotes: li.querySelector('.descricaoHidden'),
 
         buttonTimer: li.querySelector('.buttonTimer'),
-        tipoTimer:li.querySelector('.tipoTimer'),
+        tipoTimer: li.querySelector('.tipoTimer'),
+        opcaoPomodoro: li.querySelector('.opcaoPomodoro'),
+        timerHora: li.querySelector('.timerHora'),
 
         botaoData: li.querySelector('.buttonData'),
         areaDatas: li.querySelector('.datasInicioeFim'),
@@ -50,6 +54,7 @@ function obterElementosTarefa(li) {
         dataFim: li.querySelector('.dataFim'),
         resumoDatas: li.querySelector('.textoHidden'),
         horario: li.querySelector('.horario')
+
     };
 }
 
@@ -177,18 +182,78 @@ function atualizarResumoDatas(elementos) {
     resumoDatas.hidden = false;
 }
 
+
+//============================TIMER=========================//
 function configuracaoBotaoTimer(elementos) {
-    const {buttonTimer,tipoTimer } = elementos
+    const {buttonTimer, tipoTimer} = elementos;
 
     buttonTimer.addEventListener('click', () => {
-        const aberto = tipoTimer.classList.toggle(`aberto`)
-        buttonTimer.setAttribute('aria-expanded', aberto);
-
-        console.log('abrir caixa')
-    })
-
-
+        if (tipoTimer.classList.contains('aberto')) {
+            fecharTimer(elementos);
+        } else {
+            tipoTimer.classList.add('aberto');
+        }
+    });
 }
+
+function fecharTimer({tipoTimer}) {
+    tipoTimer.classList.remove('aberto', 'expandido');
+}
+
+function resetarTela({opcaoPomodoro, timerHora,tipoTimer}) {
+    opcaoPomodoro.hidden = false;
+    timerHora.hidden = false;
+    tipoTimer.querySelector('.pomodoro')?.remove();
+}
+
+function opcaoDeTimer(elementos) {
+    const {opcaoPomodoro, timerHora, tipoTimer} = elementos;
+
+    opcaoPomodoro.addEventListener('click', () => {
+        opcaoPomodoro.hidden = true;
+        timerHora.hidden = true;
+        tipoTimer.classList.add('expandido');
+    });
+    tipoTimer.addEventListener('transitionend', (e) => {
+        if (e.propertyName === 'opacity' && !tipoTimer.classList.contains('aberto')) {
+            resetarTela(elementos);
+        }
+    });
+}
+
+//=======================================POMODORO=========================================//
+
+function criarPomodoro(elementos) {
+    const {tipoTimer, opcaoPomodoro, timerHora} = elementos
+
+    tipoTimer.addEventListener('click', (e) => {
+        const opPomodoro = e.target.closest('.opcaoPomodoro')
+        if (!opPomodoro) return
+
+        opcaoPomodoro.hidden = true
+        timerHora.hidden = true
+
+        if (tipoTimer.querySelector('.pomodoro')) return
+
+        const pomodoro = document.createElement('div')
+        pomodoro.classList.add('pomodoro')
+        pomodoro.innerHTML = `
+  <div class="relogio">
+    <svg viewBox="0 0 100 100" class="anel">
+      <circle class="trilho" cx="50" cy="50" r="45"/>
+      <circle class="progresso" cx="50" cy="50" r="45"/>
+    </svg>
+    <span class="tempo">00:10</span>
+  </div>
+  <button type="button" class="botaoStart">Start</button>
+`;
+
+        tipoTimer.append(pomodoro)
+    })
+}
+
+
+//========================================================================================//
 
 function editarNomeTarefa(li) {
     const liNomeTarefa = li.querySelector('.textoTitulo');
