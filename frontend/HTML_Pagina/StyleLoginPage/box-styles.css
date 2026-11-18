@@ -550,6 +550,30 @@
     border: none;
     opacity: 0.5;
 }
+.relogio .divInputPomodoro {
+    position: absolute;
+    margin: auto;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    border: none;
+    color: #22d3ee;
+    font-size: inherit;
+    font-family: inherit;
+    text-shadow: 0 0 3px;
+    text-align: center;
+    width: 50%;
+    height: 50%;
+}
+/* Input transparente quando em foco — sem fundo, sem borda, sem outline */
+.divInputPomodoro:focus {
+    background: transparent;
+    color: #22d3ee;
+    border: none;
+    outline: none;
+    border-color: transparent;
+}
 .anel circle {
     fill: none;
     stroke-width: 6;
@@ -557,6 +581,14 @@
 
 .trilho {
     stroke: rgba(0, 0, 0, .1);
+}
+
+/* Anel de progresso — circunferência de r=45 é ~282.74 */
+.progresso {
+    stroke: #22d3ee;
+    stroke-dasharray: 283;
+    stroke-dashoffset: 0;          /* 0 = anel completo (tempo cheio) */
+    transition: stroke-dashoffset 1s linear;
 }
 
 /* ===================== Animação do Pomodoro ==================== */

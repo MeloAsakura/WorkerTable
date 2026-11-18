@@ -200,7 +200,7 @@ function fecharTimer({tipoTimer}) {
     tipoTimer.classList.remove('aberto', 'expandido');
 }
 
-function resetarTela({opcaoPomodoro, timerHora,tipoTimer}) {
+function resetarTela({opcaoPomodoro, timerHora, tipoTimer}) {
     opcaoPomodoro.hidden = false;
     timerHora.hidden = false;
     tipoTimer.querySelector('.pomodoro')?.remove();
@@ -249,11 +249,181 @@ function criarPomodoro(elementos) {
 `;
 
         tipoTimer.append(pomodoro)
+        contador(pomodoro)
     })
 }
-function contador(elementos) {
-    const {anel, tempo, botaoStart} = elementos
 
+
+function contador(elemento) {
+    const divPomodoro = elemento
+    const divTimer = divPomodoro.querySelector('.relogio')
+
+    const timer = divTimer.querySelector('.tempo')
+    const buttonStart = divPomodoro.querySelector('.botaoStart')
+
+    // Referência ao círculo do anel de progresso para animação SVG
+    const progresso = divPomodoro.querySelector('.progresso')
+    const circunferencia = 2 * Math.PI * 45
+
+    progresso.style.strokeDasharray = circunferencia
+    progresso.style.strokeDashoffset = 0
+
+    const [minutos, segundos] = timer.textContent.split(":").map(Number)
+    let totalSegundos = minutos * 60 + segundos
+    let tempoInicial = totalSegundos
+
+    function formatar(totalSegundos) {
+        let minutos = Math.floor(totalSegundos / 60)
+        let segundos = totalSegundos % 60
+
+        const m = String(minutos).padStart(2, "0")
+        const s = String(segundos).padStart(2, "0")
+
+        return `${m}:${s}`
+    }
+
+    function converterParaSegundos(tempo) {
+        const partes = tempo.split(':')
+
+        if (partes.length !== 2) return null
+
+        const [minutos, segundos] = partes.map(Number)
+
+        if (
+            !Number.isInteger(minutos) ||
+            !Number.isInteger(segundos) ||
+            minutos < 0 ||
+            segundos < 0 ||
+            segundos > 59
+        ) {
+            return null
+        }
+
+        const total = minutos * 60 + segundos
+
+        return total > 0 ? total : null
+    }
+
+    let intervalo = null
+
+    function inputTimer() {
+
+        timer.addEventListener('dblclick', (e) => {
+
+            if (!e.target.closest('.tempo')) return
+
+            if (intervalo !== null) return
+
+            const divInput = document.createElement('input')
+            divInput.classList.add('divInputPomodoro')
+            divInput.type = 'text'
+            divInput.inputMode = 'numeric'
+            divInput.value = timer.textContent
+
+            timer.replaceWith(divInput)
+            divInput.focus()
+
+
+            divInput.addEventListener('input', () => {
+                const digitos = divInput.value.replace(/\D/g, '').slice(0, 4)
+
+                divInput.value = digitos.length > 2
+                    ? `${digitos.slice(0, 2)}:${digitos.slice(2)}`
+                    : digitos
+            })
+
+            function completarValor() {
+                const digitos = divInput.value.replace(/\D/g, '')
+
+                if (!digitos) {
+                    divInput.value = ''
+                    return
+                }
+
+                const minutos = parseInt(digitos.slice(0, 2), 10)
+                const segundos = Math.min(parseInt(digitos.slice(2).padEnd(2, '0'), 10), 59)
+
+                divInput.value = formatar(minutos * 60 + segundos)
+            }
+
+            divInput.addEventListener('blur', completarValor)
+            divInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') completarValor()
+            })
+            divInput.addEventListener('keydown', (e) => {
+
+                if (e.key === 'Enter') {
+
+                    const input = divInput.value.trim()
+                    divInput.value = divInput.value.replace(/[^0-9:]/g, '')
+                    const novoTempo = converterParaSegundos(input)
+
+                    if (novoTempo === null) {
+                        divInput.focus()
+                        return
+                    }
+
+                    totalSegundos = novoTempo
+                    tempoInicial = novoTempo
+
+                    timer.textContent = formatar(totalSegundos)
+                    atualizarAnel()
+                    divInput.replaceWith(timer)
+                }
+
+                if (e.key === 'Escape') {
+                    divInput.replaceWith(timer)
+                }
+            })
+        })
+    }
+    function atualizarAnel() {
+        const proporcao = totalSegundos / tempoInicial
+        const offset = circunferencia * (1 - proporcao)
+        progresso.style.strokeDashoffset = offset
+    }
+
+    function iniciar() {
+        if (intervalo !== null || totalSegundos <= 0) return
+
+        intervalo = setInterval(() => {
+
+            totalSegundos--
+
+            timer.textContent = formatar(totalSegundos)
+            atualizarAnel()
+
+            if (totalSegundos <= 0) {
+                clearInterval(intervalo)
+                intervalo = null
+
+                buttonStart.textContent = 'Start'
+            }
+
+        }, 1000)
+    }
+
+    function pausar() {
+        clearInterval(intervalo)
+        intervalo = null
+    }
+
+    buttonStart.addEventListener('click', () => {
+
+        if (intervalo === null) {
+            iniciar()
+
+
+            if (intervalo !== null) {
+                buttonStart.textContent = 'Pause'
+            }
+
+        } else {
+            pausar()
+            buttonStart.textContent = 'Start'
+        }
+    })
+    inputTimer()
 }
 
 
