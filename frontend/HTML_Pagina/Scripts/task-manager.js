@@ -243,7 +243,7 @@ function criarPomodoro(elementos) {
       <circle class="trilho" cx="50" cy="50" r="45"/>
       <circle class="progresso" cx="50" cy="50" r="45"/>
     </svg>
-    <span class="tempo">00:10</span>
+    <span class="tempo">30:00</span>
   </div>
   <button type="button" class="botaoStart">Start</button>
 `;
@@ -251,6 +251,11 @@ function criarPomodoro(elementos) {
         tipoTimer.append(pomodoro)
     })
 }
+function contador(elementos) {
+    const {anel, tempo, botaoStart} = elementos
+
+}
+
 
 
 //========================================================================================//
