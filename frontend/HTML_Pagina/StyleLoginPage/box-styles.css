@@ -514,8 +514,8 @@
 
 .pomodoro {
     position: relative;
-    color: #22d3ee;
-    text-shadow: 0 0 3px;
+    color: black;
+    text-shadow: 0 0 2px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -558,7 +558,7 @@
     place-items: center;
     background: transparent;
     border: none;
-    color: #22d3ee;
+    color: black;
     font-size: inherit;
     font-family: inherit;
     text-shadow: 0 0 3px;
@@ -569,10 +569,9 @@
 /* Input transparente quando em foco — sem fundo, sem borda, sem outline */
 .divInputPomodoro:focus {
     background: transparent;
-    color: #22d3ee;
-    border: none;
+    color: black;
+    border:0;
     outline: none;
-    border-color: transparent;
 }
 .anel circle {
     fill: none;
@@ -587,16 +586,8 @@
 .progresso {
     stroke: #22d3ee;
     stroke-dasharray: 283;
-    stroke-dashoffset: 0;          /* 0 = anel completo (tempo cheio) */
+    stroke-dashoffset: 0;
     transition: stroke-dashoffset 1s linear;
-}
-
-/* ===================== Animação do Pomodoro ==================== */
-
-@media (prefers-reduced-motion: reduce) {
-    .opcaoPomodoro {
-        animation: none;
-    }
 }
 
 /* ============================================================== */

@@ -407,6 +407,13 @@ function contador(elemento) {
         clearInterval(intervalo)
         intervalo = null
     }
+    function alertaTerminado (){
+        const tarefa = document.getElementById('caixaDeTarefas')
+        const alertaVisual = document.createElement('div')
+
+        const diametro = Math.max(tarefa.clientWidth + tarefa.clientHeight)
+        alertaVisual.style.width = onde.style.height = `${diametro}px`
+    }
 
     buttonStart.addEventListener('click', () => {
 
