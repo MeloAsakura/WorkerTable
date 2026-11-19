@@ -203,7 +203,9 @@ function fecharTimer({tipoTimer}) {
 function resetarTela({opcaoPomodoro, timerHora, tipoTimer}) {
     opcaoPomodoro.hidden = false;
     timerHora.hidden = false;
-    tipoTimer.querySelector('.pomodoro')?.remove();
+    // Correção: .remove() substituído por .hidden = true para preservar o estado do pomodoro ao fechar o painel
+    const pomodoro = tipoTimer.querySelector('.pomodoro');
+    if (pomodoro) pomodoro.hidden = true;
 }
 
 function opcaoDeTimer(elementos) {
@@ -224,8 +226,20 @@ function opcaoDeTimer(elementos) {
 //=======================================POMODORO=========================================//
 
 function criarPomodoro(elementos) {
-    const {tipoTimer, opcaoPomodoro, timerHora} = elementos
+    // ERRO 1 e 2 corrigidos: buttonTimer extraído de elementos em vez de document.querySelector('.buttonTimer')
+    const {tipoTimer, opcaoPomodoro, timerHora, buttonTimer} = elementos
 
+    // ERRO 4 corrigido: verificação !pomodoro.hidden evita ação quando já oculto
+    // ERRO 3 corrigido: e.stopPropagation() evita conflito com configuracaoBotaoTimer
+    buttonTimer.addEventListener('click', (e) => {
+        const pomodoro = tipoTimer.querySelector('.pomodoro')
+        if (pomodoro && !pomodoro.hidden) {
+            pomodoro.hidden = true
+            opcaoPomodoro.hidden = false
+            timerHora.hidden = false
+            e.stopPropagation()
+        }
+    })
     tipoTimer.addEventListener('click', (e) => {
         const opPomodoro = e.target.closest('.opcaoPomodoro')
         if (!opPomodoro) return
@@ -233,7 +247,11 @@ function criarPomodoro(elementos) {
         opcaoPomodoro.hidden = true
         timerHora.hidden = true
 
-        if (tipoTimer.querySelector('.pomodoro')) return
+        let hasPomodoro = tipoTimer.querySelector('.pomodoro')
+        if (hasPomodoro) {
+            hasPomodoro.hidden = false
+            return
+        }
 
         const pomodoro = document.createElement('div')
         pomodoro.classList.add('pomodoro')
@@ -255,13 +273,14 @@ function criarPomodoro(elementos) {
 
 
 function contador(elemento) {
+
+
     const divPomodoro = elemento
     const divTimer = divPomodoro.querySelector('.relogio')
 
     const timer = divTimer.querySelector('.tempo')
     const buttonStart = divPomodoro.querySelector('.botaoStart')
 
-    // Referência ao círculo do anel de progresso para animação SVG
     const progresso = divPomodoro.querySelector('.progresso')
     const circunferencia = 2 * Math.PI * 45
 
@@ -346,14 +365,13 @@ function contador(elemento) {
                 divInput.value = formatar(minutos * 60 + segundos)
             }
 
-            divInput.addEventListener('blur', completarValor)
-            divInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') completarValor()
+            divInput.addEventListener('blur', () => {
+                completarValor()
             })
             divInput.addEventListener('keydown', (e) => {
 
                 if (e.key === 'Enter') {
-
+                    completarValor()
                     const input = divInput.value.trim()
                     divInput.value = divInput.value.replace(/[^0-9:]/g, '')
                     const novoTempo = converterParaSegundos(input)
@@ -372,11 +390,13 @@ function contador(elemento) {
                 }
 
                 if (e.key === 'Escape') {
+                    timer.textContent = formatar(totalSegundos)
                     divInput.replaceWith(timer)
                 }
             })
         })
     }
+
     function atualizarAnel() {
         const proporcao = totalSegundos / tempoInicial
         const offset = circunferencia * (1 - proporcao)
@@ -398,6 +418,10 @@ function contador(elemento) {
                 intervalo = null
 
                 buttonStart.textContent = 'Start'
+                alertaTerminado()
+            }else{
+                intervalo=null
+                div
             }
 
         }, 1000)
@@ -407,32 +431,35 @@ function contador(elemento) {
         clearInterval(intervalo)
         intervalo = null
     }
-    function alertaTerminado (){
-        const tarefa = document.getElementById('caixaDeTarefas')
-        const alertaVisual = document.createElement('div')
 
-        const diametro = Math.max(tarefa.clientWidth + tarefa.clientHeight)
-        alertaVisual.style.width = onde.style.height = `${diametro}px`
+    function alertaTerminado() {
+        const li = divPomodoro.closest('li');
+        if (!li) return;
+
+        somConcluido()
+        li.classList.add('tarefaConcluida');
     }
 
+    function somConcluido(){
+        const audio= document.createElement('audio')
+        audio.src='Music/mixkit-happy-bell-alert-601.wav'
+        audio.hidden=true
+        audio.play()
+
+        divPomodoro.append(audio)
+    }
     buttonStart.addEventListener('click', () => {
-
-        if (intervalo === null) {
-            iniciar()
-
-
-            if (intervalo !== null) {
-                buttonStart.textContent = 'Pause'
-            }
-
-        } else {
+        if (intervalo !== null) {
             pausar()
             buttonStart.textContent = 'Start'
+        } else {
+            iniciar()
+            buttonStart.textContent = 'Pause'
         }
     })
+
     inputTimer()
 }
-
 
 
 //========================================================================================//

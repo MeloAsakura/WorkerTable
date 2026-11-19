@@ -239,6 +239,7 @@
     border: 1px solid var(--cor-borda);
     border-radius: 14px;
     background: var(--cor-campo);
+    position: relative;
 }
 
 .newBoxTable .textoTopo {
@@ -338,6 +339,7 @@
 .newBoxTable .textoTopo {
     anchor-scope: --opcoes;
     z-index: 1;
+    position: relative;
 }
 
 .newBoxTable .acoes {
@@ -572,6 +574,7 @@
     color: black;
     border:0;
     outline: none;
+    box-shadow: none
 }
 .anel circle {
     fill: none;
@@ -664,9 +667,22 @@
 
 .newBoxTable .caixaDeTarefas {
     display: flex;
+    position: relative;
     flex-direction: column;
     gap: 6px;
     width: 100%;
+}
+.newBoxTable .newListaDeTarefasTemplate li {
+    transition:
+            background-color 0.4s ease,
+            border-color 0.4s ease,
+            box-shadow 0.4s ease;
+}
+
+.newBoxTable .newListaDeTarefasTemplate li.tarefaConcluida {
+    background-color: #dcfce7;
+    border-color: #22c55e;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
 }
 
 .newBoxTable .datasInicioeFim {
