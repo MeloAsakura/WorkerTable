@@ -517,7 +517,7 @@
 .pomodoro {
     position: relative;
     color: black;
-    text-shadow: 0 0 2px;
+    text-shadow: 0 0 1px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -563,12 +563,12 @@
     color: black;
     font-size: inherit;
     font-family: inherit;
-    text-shadow: 0 0 3px;
+    text-shadow: 0 0 1px;
     text-align: center;
     width: 50%;
     height: 50%;
 }
-/* Input transparente quando em foco — sem fundo, sem borda, sem outline */
+
 .divInputPomodoro:focus {
     background: transparent;
     color: black;
@@ -585,7 +585,6 @@
     stroke: rgba(0, 0, 0, .1);
 }
 
-/* Anel de progresso — circunferência de r=45 é ~282.74 */
 .progresso {
     stroke: #22d3ee;
     stroke-dasharray: 283;

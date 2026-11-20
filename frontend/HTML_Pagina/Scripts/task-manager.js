@@ -272,65 +272,193 @@ function criarPomodoro(elementos) {
 }
 
 
+/**
+ * Inicializa um timer Pomodoro dentro de um elemento.
+ *
+ * Estrutura HTML esperada dentro de `elemento`:
+ *   .relogio > .tempo   -> texto no formato "MM:SS" (ex.: "25:00")
+ *   .botaoStart         -> botão Start/Pause
+ *   .progresso          -> <circle> do SVG usado como anel de progresso
+ *
+ * Retorna uma função `destruir()` que deve ser chamada quando a tarefa for
+ * removida da tela (para parar o timer e remover a miniatura do DOM).
+ */
 function contador(elemento) {
 
+    // =====================================================================
+    // FUNÇÕES AUXILIARES (puras, não dependem do estado do timer)
+    // =====================================================================
 
-    const divPomodoro = elemento
-    const divTimer = divPomodoro.querySelector('.relogio')
+    // Converte segundos totais em "MM:SS". Ex.: 90 -> "01:30"
+    // (nomes min/seg evitam sombrear as variáveis de fora)
+    function formatar(total) {
+        const min = Math.floor(total / 60)
+        const seg = total % 60
 
-    const timer = divTimer.querySelector('.tempo')
-    const buttonStart = divPomodoro.querySelector('.botaoStart')
-
-    const progresso = divPomodoro.querySelector('.progresso')
-    const circunferencia = 2 * Math.PI * 45
-
-    progresso.style.strokeDasharray = circunferencia
-    progresso.style.strokeDashoffset = 0
-
-    const [minutos, segundos] = timer.textContent.split(":").map(Number)
-    let totalSegundos = minutos * 60 + segundos
-    let tempoInicial = totalSegundos
-
-    function formatar(totalSegundos) {
-        let minutos = Math.floor(totalSegundos / 60)
-        let segundos = totalSegundos % 60
-
-        const m = String(minutos).padStart(2, "0")
-        const s = String(segundos).padStart(2, "0")
-
-        return `${m}:${s}`
+        return `${String(min).padStart(2, '0')}:${String(seg).padStart(2, '0')}`
     }
 
+    // Converte "MM:SS" em segundos totais.
+    // Retorna null se o formato for inválido ou se o tempo for zero.
     function converterParaSegundos(tempo) {
         const partes = tempo.split(':')
 
         if (partes.length !== 2) return null
 
-        const [minutos, segundos] = partes.map(Number)
+        const [min, seg] = partes.map(Number)
 
         if (
-            !Number.isInteger(minutos) ||
-            !Number.isInteger(segundos) ||
-            minutos < 0 ||
-            segundos < 0 ||
-            segundos > 59
+            !Number.isInteger(min) ||
+            !Number.isInteger(seg) ||
+            min < 0 ||
+            seg < 0 ||
+            seg > 59
         ) {
             return null
         }
 
-        const total = minutos * 60 + segundos
+        const total = min * 60 + seg
 
         return total > 0 ? total : null
     }
 
-    let intervalo = null
+    // =====================================================================
+    // REFERÊNCIAS DO DOM
+    // =====================================================================
+
+    const divPomodoro = elemento
+    const divTimer = divPomodoro.querySelector('.relogio')
+    const timer = divTimer.querySelector('.tempo')
+    const buttonStart = divPomodoro.querySelector('.botaoStart')
+    const progresso = divPomodoro.querySelector('.progresso')
+
+    // =====================================================================
+    // ESTADO
+    // =====================================================================
+
+    // Lê o tempo inicial do HTML. Se estiver inválido ou "00:00",
+    // usa 25:00 como padrão (evita divisão por zero / NaN no anel).
+    const TEMPO_PADRAO = 25 * 60
+    let tempoInicial = converterParaSegundos(timer.textContent.trim()) ?? TEMPO_PADRAO
+    let totalSegundos = tempoInicial
+    timer.textContent = formatar(totalSegundos)
+
+    let intervalo = null // id do setInterval (null = timer parado)
+
+    // =====================================================================
+    // ANEL DE PROGRESSO
+    // =====================================================================
+
+    // Lê o raio direto do SVG; se não conseguir, usa 45 como fallback
+    const raio = progresso.r?.baseVal?.value || 45
+    const circunferencia = 2 * Math.PI * raio
+
+    progresso.style.strokeDasharray = circunferencia
+    progresso.style.strokeDashoffset = 0
+
+    // Atualiza o anel conforme a proporção de tempo restante
+    function atualizarAnel() {
+        const proporcao = totalSegundos / tempoInicial
+        progresso.style.strokeDashoffset = circunferencia * (1 - proporcao)
+    }
+
+    // =====================================================================
+    // MINIATURA (mostra o tempo quando este Pomodoro não está visível)
+    // =====================================================================
+
+    const miniaturaPomodoro = document.createElement('span')
+    miniaturaPomodoro.classList.add('miniaturaPomodoro')
+    miniaturaPomodoro.hidden = true
+    // Era `divPomodoro.body` (undefined) -> o correto é `document.body`.
+    // Se quiser a miniatura dentro da tarefa, use divPomodoro.appendChild(...)
+    document.body.appendChild(miniaturaPomodoro)
+
+    function atualizarMiniatura() {
+        miniaturaPomodoro.textContent = formatar(totalSegundos)
+
+        // getClientRects().length === 0 significa que o elemento não está
+        // sendo exibido (ele mesmo ou algum ancestral está com display:none
+        // ou hidden). Assim funciona também quando a "tela" inteira é escondida.
+        const pomodoroVisivel = divPomodoro.getClientRects().length > 0
+        miniaturaPomodoro.hidden = pomodoroVisivel
+    }
+
+    // =====================================================================
+    // EFEITOS DE FIM DE TIMER
+    // =====================================================================
+
+    function alertaTerminado() {
+        const li = divPomodoro.closest('li')
+        if (!li) return
+        li.classList.add('tarefaConcluida')
+    }
+
+    function somConcluido() {
+        // `new Audio` não cria elemento no DOM, então nada se acumula.
+        // O .catch evita erro no console se o navegador bloquear o autoplay.
+        new Audio('Music/mixkit-happy-bell-alert-601.wav').play().catch(() => {})
+    }
+
+    // =====================================================================
+    // CONTROLE DO TIMER
+    // =====================================================================
+
+    function iniciar() {
+        if (intervalo !== null || totalSegundos <= 0) return
+
+        // Se o usuário reiniciar uma tarefa já concluída, tira a marcação
+        const li = divPomodoro.closest('li')
+        if (li) li.classList.remove('tarefaConcluida')
+
+        // Em vez de fazer totalSegundos-- a cada tick (que acumula atraso e
+        // sofre throttling em aba inativa), guardamos o horário de término
+        // e calculamos o restante a partir do relógio real.
+        const fim = Date.now() + totalSegundos * 1000
+
+        intervalo = setInterval(() => {
+            // Math.ceil: mostra "25:00" no primeiro segundo, como um timer normal
+            totalSegundos = Math.max(0, Math.ceil((fim - Date.now()) / 1000))
+
+            timer.textContent = formatar(totalSegundos)
+            atualizarAnel()
+            atualizarMiniatura()
+
+            if (totalSegundos <= 0) finalizar()
+        }, 250) // 250ms deixa a atualização precisa sem pesar
+    }
+
+    function pausar() {
+        clearInterval(intervalo)
+        intervalo = null
+        atualizarMiniatura() // mantém a miniatura em dia mesmo parado
+    }
+
+    // Chamado quando o tempo chega a zero
+    function finalizar() {
+        clearInterval(intervalo)
+        intervalo = null
+
+        // Volta para o tempo inicial, pronto para recomeçar
+        totalSegundos = tempoInicial
+        timer.textContent = formatar(totalSegundos)
+        buttonStart.textContent = 'Start'
+
+        atualizarAnel()
+        atualizarMiniatura()
+
+        alertaTerminado()
+        somConcluido()
+    }
+
+    // =====================================================================
+    // EDIÇÃO DO TEMPO (duplo clique no relógio)
+    // =====================================================================
 
     function inputTimer() {
 
-        timer.addEventListener('dblclick', (e) => {
+        timer.addEventListener('dblclick', () => {
 
-            if (!e.target.closest('.tempo')) return
-
+            // Não permite editar enquanto o timer está rodando
             if (intervalo !== null) return
 
             const divInput = document.createElement('input')
@@ -342,7 +470,11 @@ function contador(elemento) {
             timer.replaceWith(divInput)
             divInput.focus()
 
+            // Flag que impede a lógica de rodar duas vezes: ao fazer
+            // replaceWith, o navegador pode disparar `blur` no input.
+            let encerrado = false
 
+            // Aceita só dígitos (máx. 4) e insere o ":" automaticamente
             divInput.addEventListener('input', () => {
                 const digitos = divInput.value.replace(/\D/g, '').slice(0, 4)
 
@@ -351,6 +483,7 @@ function contador(elemento) {
                     : digitos
             })
 
+            // Completa/normaliza o que foi digitado. Ex.: "12:5" -> "12:05"
             function completarValor() {
                 const digitos = divInput.value.replace(/\D/g, '')
 
@@ -359,95 +492,70 @@ function contador(elemento) {
                     return
                 }
 
-                const minutos = parseInt(digitos.slice(0, 2), 10)
-                const segundos = Math.min(parseInt(digitos.slice(2).padEnd(2, '0'), 10), 59)
+                const min = parseInt(digitos.slice(0, 2), 10)
+                // padStart: "5" vira "05" (5 segundos). Antes era padEnd ("50").
+                const seg = Math.min(parseInt(digitos.slice(2).padStart(2, '0'), 10), 59)
 
-                divInput.value = formatar(minutos * 60 + segundos)
+                divInput.value = formatar(min * 60 + seg)
             }
 
+            // Fecha o input e devolve o <span> do relógio ao DOM.
+            // salvar = true  -> aplica o novo tempo (se for válido)
+            // salvar = false -> descarta a edição
+            function encerrarEdicao(salvar) {
+                if (encerrado) return
+                encerrado = true
+
+                if (salvar) {
+                    const novoTempo = converterParaSegundos(divInput.value.trim())
+
+                    if (novoTempo !== null) {
+                        totalSegundos = novoTempo
+                        tempoInicial = novoTempo
+                    }
+                }
+
+                // Sempre reexibe o tempo atual (novo ou antigo)
+                timer.textContent = formatar(totalSegundos)
+                divInput.replaceWith(timer)
+
+                atualizarAnel()
+                atualizarMiniatura()
+            }
+
+            // Clicou fora: aplica se for válido, senão descarta.
+            // (Antes o input ficava preso na tela e o relógio sumia.)
             divInput.addEventListener('blur', () => {
                 completarValor()
+                encerrarEdicao(true)
             })
+
             divInput.addEventListener('keydown', (e) => {
 
                 if (e.key === 'Enter') {
                     completarValor()
-                    const input = divInput.value.trim()
-                    divInput.value = divInput.value.replace(/[^0-9:]/g, '')
-                    const novoTempo = converterParaSegundos(input)
 
-                    if (novoTempo === null) {
+                    // Valor inválido (ex.: vazio ou 00:00): mantém o foco
+                    // para o usuário corrigir.
+                    if (converterParaSegundos(divInput.value.trim()) === null) {
                         divInput.focus()
                         return
                     }
 
-                    totalSegundos = novoTempo
-                    tempoInicial = novoTempo
-
-                    timer.textContent = formatar(totalSegundos)
-                    atualizarAnel()
-                    divInput.replaceWith(timer)
+                    encerrarEdicao(true)
                 }
 
                 if (e.key === 'Escape') {
-                    timer.textContent = formatar(totalSegundos)
-                    divInput.replaceWith(timer)
+                    encerrarEdicao(false)
                 }
             })
         })
     }
 
-    function atualizarAnel() {
-        const proporcao = totalSegundos / tempoInicial
-        const offset = circunferencia * (1 - proporcao)
-        progresso.style.strokeDashoffset = offset
-    }
+    // =====================================================================
+    // BOTÃO START / PAUSE
+    // =====================================================================
 
-    function iniciar() {
-        if (intervalo !== null || totalSegundos <= 0) return
-
-        intervalo = setInterval(() => {
-
-            totalSegundos--
-
-            timer.textContent = formatar(totalSegundos)
-            atualizarAnel()
-
-            if (totalSegundos <= 0) {
-                clearInterval(intervalo)
-                intervalo = null
-
-                buttonStart.textContent = 'Start'
-                alertaTerminado()
-            }else{
-                intervalo=null
-                div
-            }
-
-        }, 1000)
-    }
-
-    function pausar() {
-        clearInterval(intervalo)
-        intervalo = null
-    }
-
-    function alertaTerminado() {
-        const li = divPomodoro.closest('li');
-        if (!li) return;
-
-        somConcluido()
-        li.classList.add('tarefaConcluida');
-    }
-
-    function somConcluido(){
-        const audio= document.createElement('audio')
-        audio.src='Music/mixkit-happy-bell-alert-601.wav'
-        audio.hidden=true
-        audio.play()
-
-        divPomodoro.append(audio)
-    }
     buttonStart.addEventListener('click', () => {
         if (intervalo !== null) {
             pausar()
@@ -458,8 +566,24 @@ function contador(elemento) {
         }
     })
 
+    // =====================================================================
+    // INICIALIZAÇÃO
+    // =====================================================================
+
     inputTimer()
+    atualizarAnel()
+    atualizarMiniatura()
+
+    // Limpeza: chame quando a tarefa (li) for removida, para o setInterval
+    // não continuar rodando e a miniatura não ficar órfã no body.
+    // Exemplo: const destruir = contador(div); ... destruir()
+    return function destruir() {
+        clearInterval(intervalo)
+        intervalo = null
+        miniaturaPomodoro.remove()
+    }
 }
+
 
 
 //========================================================================================//
