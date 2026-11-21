@@ -367,21 +367,25 @@ function contador(elemento) {
     // =====================================================================
 
     const miniaturaPomodoro = document.createElement('span')
+    const caixaTarefa= document.querySelector('.caixaDeTarefas')
     miniaturaPomodoro.classList.add('miniaturaPomodoro')
     miniaturaPomodoro.hidden = true
-    // Era `divPomodoro.body` (undefined) -> o correto é `document.body`.
-    // Se quiser a miniatura dentro da tarefa, use divPomodoro.appendChild(...)
-    document.body.appendChild(miniaturaPomodoro)
+    caixaTarefa.appendChild(miniaturaPomodoro)
+
 
     function atualizarMiniatura() {
         miniaturaPomodoro.textContent = formatar(totalSegundos)
-
-        // getClientRects().length === 0 significa que o elemento não está
-        // sendo exibido (ele mesmo ou algum ancestral está com display:none
-        // ou hidden). Assim funciona também quando a "tela" inteira é escondida.
         const pomodoroVisivel = divPomodoro.getClientRects().length > 0
         miniaturaPomodoro.hidden = pomodoroVisivel
     }
+
+    function recomecarPelaMiniatura(){
+        miniaturaPomodoro.addEventListener('click',()=>{
+
+
+        })
+    }
+    recomecarPelaMiniatura()
 
     // =====================================================================
     // EFEITOS DE FIM DE TIMER
@@ -406,17 +410,12 @@ function contador(elemento) {
     function iniciar() {
         if (intervalo !== null || totalSegundos <= 0) return
 
-        // Se o usuário reiniciar uma tarefa já concluída, tira a marcação
         const li = divPomodoro.closest('li')
         if (li) li.classList.remove('tarefaConcluida')
 
-        // Em vez de fazer totalSegundos-- a cada tick (que acumula atraso e
-        // sofre throttling em aba inativa), guardamos o horário de término
-        // e calculamos o restante a partir do relógio real.
         const fim = Date.now() + totalSegundos * 1000
 
         intervalo = setInterval(() => {
-            // Math.ceil: mostra "25:00" no primeiro segundo, como um timer normal
             totalSegundos = Math.max(0, Math.ceil((fim - Date.now()) / 1000))
 
             timer.textContent = formatar(totalSegundos)
@@ -430,7 +429,7 @@ function contador(elemento) {
     function pausar() {
         clearInterval(intervalo)
         intervalo = null
-        atualizarMiniatura() // mantém a miniatura em dia mesmo parado
+        atualizarMiniatura()
     }
 
     // Chamado quando o tempo chega a zero
@@ -592,6 +591,7 @@ function editarNomeTarefa(li) {
     const liNomeTarefa = li.querySelector('.textoTitulo');
 
     const inputNovoNome = document.createElement('input');
+    inputNovoNome.style.width='150px'
     inputNovoNome.value = liNomeTarefa.textContent;
 
     liNomeTarefa.replaceWith(inputNovoNome);
