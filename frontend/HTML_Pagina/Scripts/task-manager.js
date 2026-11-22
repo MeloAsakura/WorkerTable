@@ -264,6 +264,10 @@ function criarPomodoro(elementos) {
     <span class="tempo">30:00</span>
   </div>
   <button type="button" class="botaoStart">Start</button>
+  <!-- COMO FOI FEITO: Container para os ciclos de pomodoro completados -->
+  <!-- Cada ciclo é um <div class="ciclo"> criado dinamicamente -->
+  <!-- pela função ciclosPomodoro() quando o timer termina. -->
+  <div class="ciclos"></div>
 `;
 
         tipoTimer.append(pomodoro)
@@ -332,6 +336,14 @@ function contador(elemento) {
     const buttonStart = divPomodoro.querySelector('.botaoStart')
     const progresso = divPomodoro.querySelector('.progresso')
 
+    // OPÇÃO 2: Referência ao botão do timer e painel para transformar o botão em miniatura
+    // Em vez de criar um <span> separado, o próprio buttonTimer mostra o tempo
+    const liTarefa = divPomodoro.closest('li')
+    const buttonTimer = liTarefa ? liTarefa.querySelector('.buttonTimer') : null
+    const tipoTimer = liTarefa ? liTarefa.querySelector('.tipoTimer') : null
+    // Guardamos o HTML original do botão para restaurar quando o painel abrir
+    const buttonTimerHTMLOriginal = buttonTimer ? buttonTimer.innerHTML : ''
+
     // =====================================================================
     // ESTADO
     // =====================================================================
@@ -363,29 +375,79 @@ function contador(elemento) {
     }
 
     // =====================================================================
-    // MINIATURA (mostra o tempo quando este Pomodoro não está visível)
+    // OPÇÃO 2: BOTÃO TIMER VIRA MINIATURA
+    // =====================================================================
+    // COMO FOI FEITO: Em vez de criar um <span> separado (miniaturaPomodoro) e
+    // anexá-lo a .caixaDeTarefas, o próprio buttonTimer é transformado para
+    // mostrar o tempo formatado ao lado do ícone do relógio.
+    //
+    // Quando o painel do timer (.tipoTimer) está aberto/expandido, o botão
+    // volta ao ícone original. Quando o painel fecha, o botão mostra "🕐 MM:SS".
+    //
+    // Isso foi feito substituindo o innerHTML do buttonTimer dinamicamente
+    // a cada tick do timer, e restaurando o HTML original ao abrir o painel.
     // =====================================================================
 
-    const miniaturaPomodoro = document.createElement('span')
-    const caixaTarefa= document.querySelector('.caixaDeTarefas')
-    miniaturaPomodoro.classList.add('miniaturaPomodoro')
-    miniaturaPomodoro.hidden = true
-    caixaTarefa.appendChild(miniaturaPomodoro)
+    // Função que verifica se o painel do timer está visível na tela
+    // Usado para decidir se o botão deve mostrar o tempo ou o ícone original
+    function painelEstaVisivel() {
+        return tipoTimer && (tipoTimer.classList.contains('aberto') || tipoTimer.classList.contains('expandido'))
+    }
 
+    // Flag para saber se o pomodoro já foi iniciado pelo usuário
+    // A miniatura só aparece depois que o timer é iniciado, não na criação
+    let pomodoroIniciado = false
 
+    // Atualiza o botão do timer para mostrar o tempo ou o ícone original
+    // COMO FOI FEITO: A cada chamada, verifica se o painel está visível.
+    // Se estiver visível, restaura o ícone SVG original.
+    // Se estiver escondido E o pomodoro foi iniciado, substitui o conteúdo
+    // por ícone + tempo formatado. Se o pomodoro não foi iniciado, não altera o botão.
+    function atualizarBotaoTimer() {
+        if (!buttonTimer) return
+
+        if (painelEstaVisivel()) {
+            // Painel aberto: restaura o ícone original do botão
+            buttonTimer.innerHTML = buttonTimerHTMLOriginal
+            buttonTimer.classList.remove('pomodoroAtivo')
+        } else if (pomodoroIniciado) {
+            // Painel fechado e pomodoro já foi iniciado: botão vira a miniatura
+            // Formato: ícone de relógio + tempo "MM:SS"
+            buttonTimer.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="16" height="16"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round"
+                     style="margin-right: 4px;">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span class="tempoMiniatura">${formatar(totalSegundos)}</span>
+            `
+            buttonTimer.classList.add('pomodoroAtivo')
+        } else {
+            buttonTimer.addEventListener('dblclick', () => {
+                buttonTimer.classList.remove('pomodoroAtivo')
+
+            })
+
+        }
+    }
+
+    // Renomeada de atualizarMiniatura para atualizarBotaoTimer
+    // Agora chama a função acima em vez de atualizar um <span> separado
     function atualizarMiniatura() {
-        miniaturaPomodoro.textContent = formatar(totalSegundos)
-        const pomodoroVisivel = divPomodoro.getClientRects().length > 0
-        miniaturaPomodoro.hidden = pomodoroVisivel
+        atualizarBotaoTimer()
     }
 
-    function recomecarPelaMiniatura(){
-        miniaturaPomodoro.addEventListener('click',()=>{
-
-
-        })
-    }
-    recomecarPelaMiniatura()
+    // O clique no buttonTimer para abrir/fechar o painel já é gerenciado por
+    // configuracaoBotaoTimer() (linha ~190). Não é necessário adicionar outro
+    // listener aqui — o botão já abre o painel ao ser clicado, mesmo mostrando
+    // o tempo da miniatura.
 
     // =====================================================================
     // EFEITOS DE FIM DE TIMER
@@ -397,10 +459,40 @@ function contador(elemento) {
         li.classList.add('tarefaConcluida')
     }
 
+    function ciclosPomodoro() {
+        if (tipoTimer && tipoTimer.classList.contains('expandido')) {
+
+            const pomodoroAbertoExpandido = divPomodoro
+            const ciclosContainer = pomodoroAbertoExpandido.querySelector('.ciclos')
+
+            const ciclo = document.createElement('button')
+            ciclo.classList.add('ciclo')
+            ciclo.textContent = '+'
+
+            if (!ciclosContainer) return
+
+            ciclosContainer.append(ciclo)
+
+            ciclo.addEventListener('click',(e)=>{
+                const circuloDeCiclo = document.createElement('div')
+                circuloDeCiclo.classList.add('circuloDeCiclo')
+                circuloDeCiclo.style.width='20px'
+                circuloDeCiclo.style.height='20px'
+                circuloDeCiclo.style.background='black'
+
+                ciclosContainer.append(circuloDeCiclo)
+            })
+
+        }
+    }
+
+    ciclosPomodoro()
+
     function somConcluido() {
         // `new Audio` não cria elemento no DOM, então nada se acumula.
         // O .catch evita erro no console se o navegador bloquear o autoplay.
-        new Audio('Music/mixkit-happy-bell-alert-601.wav').play().catch(() => {})
+        new Audio('Music/mixkit-happy-bell-alert-601.wav').play().catch(() => {
+        })
     }
 
     // =====================================================================
@@ -409,6 +501,9 @@ function contador(elemento) {
 
     function iniciar() {
         if (intervalo !== null || totalSegundos <= 0) return
+
+        // Marca que o pomodoro foi iniciado — a miniatura agora aparece no botão
+        pomodoroIniciado = true
 
         const li = divPomodoro.closest('li')
         if (li) li.classList.remove('tarefaConcluida')
@@ -573,16 +668,34 @@ function contador(elemento) {
     atualizarAnel()
     atualizarMiniatura()
 
-    // Limpeza: chame quando a tarefa (li) for removida, para o setInterval
-    // não continuar rodando e a miniatura não ficar órfã no body.
-    // Exemplo: const destruir = contador(div); ... destruir()
+    // OPÇÃO 2: Quando o painel do timer fecha (transição de opacity termina),
+    // o botão é atualizado para mostrar o tempo
+    // COMO FOI FEITO: Adicionado listener no transitionend do tipoTimer para
+    // chamar atualizarBotaoTimer() assim que o painel desaparecer, garantindo
+    // que o botão mostre o tempo "MM:SS" ao lado do ícone.
+    if (tipoTimer) {
+        tipoTimer.addEventListener('transitionend', (e) => {
+            if (e.propertyName === 'opacity') {
+                atualizarBotaoTimer()
+            }
+        })
+    }
+
+    // OPÇÃO 2: Limpeza atualizada — não há mais <span> miniatura para remover
+    // COMO FOI FEITO: Removida a linha `miniaturaPomodoro.remove()` porque a miniatura
+    // agora é o próprio buttonTimer, que faz parte do DOM da tarefa e será removido
+    // junto com o elemento <li> quando a tarefa for deletada.
+    // Resta apenas parar o intervalo e restaurar o botão ao estado original.
     return function destruir() {
         clearInterval(intervalo)
         intervalo = null
-        miniaturaPomodoro.remove()
+        // Restaurar o botão ao ícone original, caso ainda exista
+        if (buttonTimer) {
+            buttonTimer.innerHTML = buttonTimerHTMLOriginal
+            buttonTimer.classList.remove('pomodoroAtivo')
+        }
     }
 }
-
 
 
 //========================================================================================//
@@ -591,7 +704,7 @@ function editarNomeTarefa(li) {
     const liNomeTarefa = li.querySelector('.textoTitulo');
 
     const inputNovoNome = document.createElement('input');
-    inputNovoNome.style.width='150px'
+    inputNovoNome.style.width = '150px'
     inputNovoNome.value = liNomeTarefa.textContent;
 
     liNomeTarefa.replaceWith(inputNovoNome);
