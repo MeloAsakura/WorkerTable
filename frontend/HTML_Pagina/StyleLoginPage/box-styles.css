@@ -498,6 +498,10 @@
     transition: opacity .15s ease,
     transform .2s ease,
     height .3s ease;
+
+    scrollbar-width: thin;
+    scrollbar-color: rgba(47, 84, 184, .35) #f1f1f1;
+    scrollbar-gutter: stable;
 }
 
 .containerTimer .tipoTimer.aberto {
@@ -524,8 +528,26 @@
     flex-direction: row;
     gap: 3px;
     width: 120px;
-
+overflow-y: auto;
+    overflow-x:hidden ;
 }
+.containerTimer .tipoTimer::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+.containerTimer .tipoTimer::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+.containerTimer .tipoTimer::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 1px;
+}
+
+.containerTimer .tipoTimer::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
 
 .opcaoPomodoro,
 .timerHora {
@@ -554,8 +576,6 @@
     transition: opacity .15s ease, transform .2s ease;
 }
 
-
-
 .pomodoro {
     position: relative;
     color: black;
@@ -566,26 +586,18 @@
     gap: 8px;
 }
 
-/* COMO FOI FEITO: Container dentro de .timerPomorodo que recebe os ciclos */
-/* completados. Usa posicionamento absoluto com top e right para posicionar */
-/* no canto superior direito do painel pomodoro, ao lado do anel de contagem. */
 .pomodoro .ciclos {
-    position: absolute;
+    position: fixed;
     top: 10px;
-    right: 2px;
-    display: flex;
-    flex-wrap: wrap;
+    right: -48px;
+    display: grid;
+    grid-template-columns: repeat(3, 22px);
     gap: 4px;
-    justify-content: flex-end;
+    justify-content: end;
     padding: 0;
     max-width: 90px;
 }
 
-/* COMO FOI FEITO: Cada ciclo tem aparência de botão com background transparente */
-/* e ícone de check SVG em tom leve (verde claro #86efac). A borda sutil e a sombra */
-/* mantêm a consistência com .opcaoPomodoro e .buttonOpcoes, mas o fundo transparente */
-/* faz o ciclo se integrar ao painel sem destacar demais. O hover aplica um fundo suave */
-/* para dar feedback visual ao passar o mouse. */
 .pomodoro .ciclos .ciclo {
     width: 22px;
     height: 22px;
@@ -607,6 +619,18 @@
     transform: scale(1.1);
     box-shadow: 0 2px 6px rgba(0, 0, 0, .12);
 }
+
+.pomodoro .ciclos .circuloDeCiclo {
+    grid-column: 1 / -1;
+    position: relative;
+    right: -4px;
+    width: 15px;
+    height: 15px;
+    border-radius: 9px;
+    background: transparent;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
 .relogio {
     position: relative;      /* referência para o anel e o texto */
     width: 120px;
@@ -674,7 +698,6 @@
     stroke-dashoffset: 0;
     transition: stroke-dashoffset 1s linear;
 }
-
 
     /* .miniaturaPomodoro removido — OPÇÃO 2: o botão do timer agora é a miniatura */
 

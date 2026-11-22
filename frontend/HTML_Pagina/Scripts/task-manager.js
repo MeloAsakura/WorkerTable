@@ -374,45 +374,20 @@ function contador(elemento) {
         progresso.style.strokeDashoffset = circunferencia * (1 - proporcao)
     }
 
-    // =====================================================================
-    // OPÇÃO 2: BOTÃO TIMER VIRA MINIATURA
-    // =====================================================================
-    // COMO FOI FEITO: Em vez de criar um <span> separado (miniaturaPomodoro) e
-    // anexá-lo a .caixaDeTarefas, o próprio buttonTimer é transformado para
-    // mostrar o tempo formatado ao lado do ícone do relógio.
-    //
-    // Quando o painel do timer (.tipoTimer) está aberto/expandido, o botão
-    // volta ao ícone original. Quando o painel fecha, o botão mostra "🕐 MM:SS".
-    //
-    // Isso foi feito substituindo o innerHTML do buttonTimer dinamicamente
-    // a cada tick do timer, e restaurando o HTML original ao abrir o painel.
-    // =====================================================================
-
-    // Função que verifica se o painel do timer está visível na tela
-    // Usado para decidir se o botão deve mostrar o tempo ou o ícone original
     function painelEstaVisivel() {
         return tipoTimer && (tipoTimer.classList.contains('aberto') || tipoTimer.classList.contains('expandido'))
     }
 
-    // Flag para saber se o pomodoro já foi iniciado pelo usuário
-    // A miniatura só aparece depois que o timer é iniciado, não na criação
+
     let pomodoroIniciado = false
 
-    // Atualiza o botão do timer para mostrar o tempo ou o ícone original
-    // COMO FOI FEITO: A cada chamada, verifica se o painel está visível.
-    // Se estiver visível, restaura o ícone SVG original.
-    // Se estiver escondido E o pomodoro foi iniciado, substitui o conteúdo
-    // por ícone + tempo formatado. Se o pomodoro não foi iniciado, não altera o botão.
     function atualizarBotaoTimer() {
         if (!buttonTimer) return
 
         if (painelEstaVisivel()) {
-            // Painel aberto: restaura o ícone original do botão
             buttonTimer.innerHTML = buttonTimerHTMLOriginal
             buttonTimer.classList.remove('pomodoroAtivo')
         } else if (pomodoroIniciado) {
-            // Painel fechado e pomodoro já foi iniciado: botão vira a miniatura
-            // Formato: ícone de relógio + tempo "MM:SS"
             buttonTimer.innerHTML = `
                 <svg xmlns="http://www.w3.org/2000/svg"
                      width="16" height="16"
@@ -438,16 +413,9 @@ function contador(elemento) {
         }
     }
 
-    // Renomeada de atualizarMiniatura para atualizarBotaoTimer
-    // Agora chama a função acima em vez de atualizar um <span> separado
     function atualizarMiniatura() {
         atualizarBotaoTimer()
     }
-
-    // O clique no buttonTimer para abrir/fechar o painel já é gerenciado por
-    // configuracaoBotaoTimer() (linha ~190). Não é necessário adicionar outro
-    // listener aqui — o botão já abre o painel ao ser clicado, mesmo mostrando
-    // o tempo da miniatura.
 
     // =====================================================================
     // EFEITOS DE FIM DE TIMER
@@ -476,10 +444,6 @@ function contador(elemento) {
             ciclo.addEventListener('click',(e)=>{
                 const circuloDeCiclo = document.createElement('div')
                 circuloDeCiclo.classList.add('circuloDeCiclo')
-                circuloDeCiclo.style.width='20px'
-                circuloDeCiclo.style.height='20px'
-                circuloDeCiclo.style.background='black'
-
                 ciclosContainer.append(circuloDeCiclo)
             })
 
@@ -539,6 +503,7 @@ function contador(elemento) {
 
         atualizarAnel()
         atualizarMiniatura()
+
 
         alertaTerminado()
         somConcluido()
@@ -628,9 +593,6 @@ function contador(elemento) {
 
                 if (e.key === 'Enter') {
                     completarValor()
-
-                    // Valor inválido (ex.: vazio ou 00:00): mantém o foco
-                    // para o usuário corrigir.
                     if (converterParaSegundos(divInput.value.trim()) === null) {
                         divInput.focus()
                         return
