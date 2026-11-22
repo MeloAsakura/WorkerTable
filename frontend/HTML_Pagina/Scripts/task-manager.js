@@ -291,7 +291,7 @@ function contador(elemento) {
 
     // =====================================================================
     // FUNÇÕES AUXILIARES (puras, não dependem do estado do timer)
-    // =====================================================================
+    // ====================================================================
 
     // Converte segundos totais em "MM:SS". Ex.: 90 -> "01:30"
     // (nomes min/seg evitam sombrear as variáveis de fora)
@@ -451,6 +451,13 @@ function contador(elemento) {
     }
 
     ciclosPomodoro()
+
+    function conclusaoDeCiclos(){
+
+        const ciclos = document.querySelectorAll('.circuloDeCiclo')
+
+
+    }
 
     function somConcluido() {
         // `new Audio` não cria elemento no DOM, então nada se acumula.
