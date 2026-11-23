@@ -576,6 +576,8 @@ function observarBox(box) {
         const divText = box.querySelector('.blocoDeAnotacoes');
         if (!divText) return;
 
+        // Correção: calcular rect antes de usar (variável estava não definida)
+        const rect = box.getBoundingClientRect();
         divText.style.width = `${rect.width}px`
         divText.style.height = `${rect.height}px`
 

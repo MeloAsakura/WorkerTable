@@ -630,6 +630,9 @@ overflow-y: auto;
     background: transparent;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
+.pomodoro .ciclos .circuloDeCiclo.concluido{
+    background:darkolivegreen;
+}
 
 .relogio {
     position: relative;      /* referência para o anel e o texto */

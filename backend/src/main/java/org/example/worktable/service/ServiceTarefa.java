@@ -34,7 +34,8 @@ public class ServiceTarefa {
             Tarefa createTarefa=repository.createTarefa(t);
 
             if(createTarefa==null){
-                throw new RuntimeException();
+                // Correção: adicionar mensagem descritiva ao RuntimeException
+                throw new RuntimeException("Não foi possível criar a tarefa: o repositório retornou null.");
             }
             return createTarefa;
         }

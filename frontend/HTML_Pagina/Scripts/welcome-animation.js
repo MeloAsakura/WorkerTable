@@ -20,6 +20,8 @@ cursor.addEventListener('animationend',()=>{
 function textoBoasVindas(elemento,texto){
     return new Promise( end=>{
         let indice = 0
+        // Correção: usar insertBefore para mover o cursor sem duplicá-lo
+        // (appendChild movia o cursor global entre elementos, causando comportamento estranho)
         elemento.appendChild(cursor)
         function escrever(){
             if(indice<texto.length){

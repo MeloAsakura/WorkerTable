@@ -13,22 +13,27 @@ public class TarefaRepo {
 
 
     public int deleteTarefa(Long idUser, Long idTarefa) {
-        String sql = "DELETE FROM TAREFA WHERE ID=? AND ID_USER=?";
+        // Correção: unificar nome da tabela para TAREFAS (plural) para consistência com UPDATE e INSERT
+        String sql = "DELETE FROM TAREFAS WHERE ID=? AND ID_USER=?";
 
+        // Correção: declarar deleteConfirmed fora do try para estar no escopo do return
+        int deleteConfirmed = 0;
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setLong(1, idUser);
-            stmt.setLong(2, idTarefa);
+            // Correção: parâmetros estavam trocados (idUser em ID, idTarefa em ID_USER)
+            stmt.setLong(1, idTarefa);
+            stmt.setLong(2, idUser);
 
-            int deleteConfirmed = stmt.executeUpdate();
+            deleteConfirmed = stmt.executeUpdate();
             if (deleteConfirmed > 0) {
                 System.out.println("Confirmado.");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return 0;
+        // Correção: retornar deleteConfirmed em vez de 0 (sempre retornava 0 mesmo após deletar)
+        return deleteConfirmed;
     }
 
     public boolean updateNomeTarefaById(Long id, String novoNome) {
@@ -52,7 +57,8 @@ public class TarefaRepo {
 
     public Tarefa createTarefa(Tarefa tarefa) throws SQLException {
 
-        String sql="INSERT INTO TAREFAS (NOME,NOTES) VALUE(?,?)";
+        // Correção: VALUE deve ser VALUES (plural) conforme sintaxe SQL padrão
+        String sql="INSERT INTO TAREFAS (NOME,NOTES) VALUES(?,?)";
 
         try(Connection conn=ConnectionFactory.getConnection();
         PreparedStatement stmt= conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
