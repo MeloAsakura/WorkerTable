@@ -25,6 +25,7 @@ function criarTarefa(titulo, lista) {
     opcaoDeTimer(elementos);
     criarPomodoro(elementos)
 
+
     adicionarTarefaNaLista(tarefa, lista);
 }
 
@@ -200,22 +201,30 @@ function fecharTimer({tipoTimer}) {
     tipoTimer.classList.remove('aberto', 'expandido');
 }
 
-function resetarTela({opcaoPomodoro, timerHora, tipoTimer}) {
+function resetarTela({opcaoPomodoro, timerHora, tipoTimer,horario}) {
     opcaoPomodoro.hidden = false;
     timerHora.hidden = false;
-    // Correção: .remove() substituído por .hidden = true para preservar o estado do pomodoro ao fechar o painel
+    horario.hidden = true;
+    horario.setAttribute('aria-expanded', 'false');
     const pomodoro = tipoTimer.querySelector('.pomodoro');
     if (pomodoro) pomodoro.hidden = true;
 }
 
 function opcaoDeTimer(elementos) {
-    const {opcaoPomodoro, timerHora, tipoTimer} = elementos;
+    const {opcaoPomodoro, timerHora, tipoTimer,horario} = elementos;
 
     opcaoPomodoro.addEventListener('click', () => {
         opcaoPomodoro.hidden = true;
         timerHora.hidden = true;
         tipoTimer.classList.add('expandido');
     });
+    timerHora.addEventListener('click',()=>{
+        opcaoPomodoro.hidden=true
+        timerHora.hidden=true
+        horario.hidden=false
+        horario.setAttribute('aria-expanded', 'true');
+        tipoTimer.classList.add('expandido')
+    })
     tipoTimer.addEventListener('transitionend', (e) => {
         if (e.propertyName === 'opacity' && !tipoTimer.classList.contains('aberto')) {
             resetarTela(elementos);
@@ -226,11 +235,8 @@ function opcaoDeTimer(elementos) {
 //=======================================POMODORO=========================================//
 
 function criarPomodoro(elementos) {
-    // ERRO 1 e 2 corrigidos: buttonTimer extraído de elementos em vez de document.querySelector('.buttonTimer')
     const {tipoTimer, opcaoPomodoro, timerHora, buttonTimer} = elementos
 
-    // ERRO 4 corrigido: verificação !pomodoro.hidden evita ação quando já oculto
-    // ERRO 3 corrigido: e.stopPropagation() evita conflito com configuracaoBotaoTimer
     buttonTimer.addEventListener('click', (e) => {
         const pomodoro = tipoTimer.querySelector('.pomodoro')
         if (pomodoro && !pomodoro.hidden) {
@@ -240,6 +246,7 @@ function criarPomodoro(elementos) {
             e.stopPropagation()
         }
     })
+
     tipoTimer.addEventListener('click', (e) => {
         const opPomodoro = e.target.closest('.opcaoPomodoro')
         if (!opPomodoro) return
@@ -264,9 +271,6 @@ function criarPomodoro(elementos) {
     <span class="tempo">30:00</span>
   </div>
   <button type="button" class="botaoStart">Start</button>
-  <!-- COMO FOI FEITO: Container para os ciclos de pomodoro completados -->
-  <!-- Cada ciclo é um <div class="ciclo"> criado dinamicamente -->
-  <!-- pela função ciclosPomodoro() quando o timer termina. -->
   <div class="ciclos"></div>
 `;
 
@@ -275,6 +279,21 @@ function criarPomodoro(elementos) {
     })
 }
 
+
+function timerHora(elementos){
+    const {tipoTimer, timerHora, buttonTimer} = elementos
+
+    if(!tipoTimer.classList.contains('aberto') && !tipoTimer.classList.contains('expandido')) return
+
+    const hora = document.createElement('div')
+    hora.classList.add('hora')
+    hora.style.width='20px'
+    hora.style.height='20px'
+    hora.style.background='black'
+    hora.style.position='absolute'
+
+    tipoTimer.append(hora)
+}
 
 /**
  * Inicializa um timer Pomodoro dentro de um elemento.
@@ -381,6 +400,10 @@ function contador(elemento) {
 
     let pomodoroIniciado = false
     let listenerDblclickAdicionado = false
+    let emPausa = false
+
+    const TEMPO_PAUSA = 5*60
+    let tempoFoco = tempoInicial
 
     function atualizarBotaoTimer() {
         if (!buttonTimer) return
@@ -447,225 +470,211 @@ function contador(elemento) {
             circulos.push(circulo)
         })
 
+
         return function concluirCiclo() {
             if (concluidos < circulos.length) {
                 circulos[concluidos].classList.add('concluido')
                 concluidos++
             }
-            if(concluidos>1){ return true}
         }
     }
 
-const concluirCiclo = ciclosPomodoro(divPomodoro)
+    const concluirCiclo = ciclosPomodoro(divPomodoro)
 
-function somConcluido() {
-    // `new Audio` não cria elemento no DOM, então nada se acumula.
-    // O .catch evita erro no console se o navegador bloquear o autoplay.
-    new Audio('Music/mixkit-happy-bell-alert-601.wav').play().catch(() => {
-    })
-}
+
+    function somConcluido() {
+        new Audio('Music/mixkit-happy-bell-alert-601.wav').play().catch(() => {
+        })
+    }
 
 // =====================================================================
 // CONTROLE DO TIMER
 // =====================================================================
 
-function iniciar() {
-    if (intervalo !== null || totalSegundos <= 0) return
+    function iniciar() {
+        if (intervalo !== null || totalSegundos <= 0) return
 
-    // Marca que o pomodoro foi iniciado — a miniatura agora aparece no botão
-    pomodoroIniciado = true
+        pomodoroIniciado = true
 
-    const li = divPomodoro.closest('li')
-    if (li) li.classList.remove('tarefaConcluida')
+        const li = divPomodoro.closest('li')
+        if (li) li.classList.remove('tarefaConcluida')
 
-    const fim = Date.now() + totalSegundos * 1000
+        const fim = Date.now() + totalSegundos * 1000
 
-    intervalo = setInterval(() => {
-        totalSegundos = Math.max(0, Math.ceil((fim - Date.now()) / 1000))
+        intervalo = setInterval(() => {
+            totalSegundos = Math.max(0, Math.ceil((fim - Date.now()) / 1000))
 
-        timer.textContent = formatar(totalSegundos)
+            timer.textContent = formatar(totalSegundos)
+            atualizarAnel()
+            atualizarMiniatura()
+
+            if (totalSegundos <= 0) finalizar()
+        }, 250) // 250ms deixa a atualização precisa sem pesar
+    }
+
+    function pausar() {
+        clearInterval(intervalo)
+        intervalo = null
+        atualizarMiniatura()
+    }
+    let q= 0
+    const PAUSA_LONGA=900
+    function finalizar() {
+        clearInterval(intervalo)
+        intervalo = null
+
+        if (!emPausa) {
+            tempoFoco = tempoInicial
+            emPausa = true
+            if (concluirCiclo) concluirCiclo()
+
+            q++
+            const pausa = q % 4 === 0 ? PAUSA_LONGA : TEMPO_PAUSA
+
+            tempoInicial = pausa
+            totalSegundos = pausa
+            timer.textContent = formatar(totalSegundos)
+            buttonStart.textContent = 'Pause'
+
+            iniciar()
+        } else {
+            emPausa = false
+            tempoInicial = tempoFoco
+            totalSegundos = tempoFoco
+            timer.textContent = formatar(totalSegundos)
+            buttonStart.textContent = 'Start'
+        }
         atualizarAnel()
         atualizarMiniatura()
-
-        if (totalSegundos <= 0) finalizar()
-    }, 250) // 250ms deixa a atualização precisa sem pesar
-}
-
-function pausar() {
-    clearInterval(intervalo)
-    intervalo = null
-    atualizarMiniatura()
-}
-
-// Chamado quando o tempo chega a zero
-function finalizar() {
-    clearInterval(intervalo)
-    intervalo = null
-
-    // Volta para o tempo inicial, pronto para recomeçar
-    totalSegundos = tempoInicial
-    timer.textContent = formatar(totalSegundos)
-    buttonStart.textContent = 'Start'
-
-    atualizarAnel()
-    atualizarMiniatura()
-
-    // Correção: usar concluirCiclo (retornado por ciclosPomodoro) em vez de conclusaoDeCiclos (inexistente)
-    if (concluirCiclo) concluirCiclo()
-    const {con} = concluirCiclo()
-    if()
-    alertaTerminado()
-    somConcluido()
-}
-
+        alertaTerminado()
+        somConcluido()
+    }
 // =====================================================================
 // EDIÇÃO DO TEMPO (duplo clique no relógio)
 // =====================================================================
 
-function inputTimer() {
+    function inputTimer() {
 
-    timer.addEventListener('dblclick', () => {
+        timer.addEventListener('dblclick', () => {
 
-        // Não permite editar enquanto o timer está rodando
-        if (intervalo !== null) return
+            // Não permite editar enquanto o timer está rodando
+            if (intervalo !== null) return
 
-        const divInput = document.createElement('input')
-        divInput.classList.add('divInputPomodoro')
-        divInput.type = 'text'
-        divInput.inputMode = 'numeric'
-        divInput.value = timer.textContent
+            const divInput = document.createElement('input')
+            divInput.classList.add('divInputPomodoro')
+            divInput.type = 'text'
+            divInput.inputMode = 'numeric'
+            divInput.value = timer.textContent
 
-        timer.replaceWith(divInput)
-        divInput.focus()
+            timer.replaceWith(divInput)
+            divInput.focus()
 
-        // Flag que impede a lógica de rodar duas vezes: ao fazer
-        // replaceWith, o navegador pode disparar `blur` no input.
-        let encerrado = false
+            // Flag que impede a lógica de rodar duas vezes: ao fazer
+            // replaceWith, o navegador pode disparar `blur` no input.
+            let encerrado = false
 
-        // Aceita só dígitos (máx. 4) e insere o ":" automaticamente
-        divInput.addEventListener('input', () => {
-            const digitos = divInput.value.replace(/\D/g, '').slice(0, 4)
+            // Aceita só dígitos (máx. 4) e insere o ":" automaticamente
+            divInput.addEventListener('input', () => {
+                const digitos = divInput.value.replace(/\D/g, '').slice(0, 4)
 
-            divInput.value = digitos.length > 2
-                ? `${digitos.slice(0, 2)}:${digitos.slice(2)}`
-                : digitos
-        })
+                divInput.value = digitos.length > 2
+                    ? `${digitos.slice(0, 2)}:${digitos.slice(2)}`
+                    : digitos
+            })
 
-        // Completa/normaliza o que foi digitado. Ex.: "12:5" -> "12:05"
-        function completarValor() {
-            const digitos = divInput.value.replace(/\D/g, '')
 
-            if (!digitos) {
-                divInput.value = ''
-                return
-            }
-
-            const min = parseInt(digitos.slice(0, 2), 10)
-            // padStart: "5" vira "05" (5 segundos). Antes era padEnd ("50").
-            const seg = Math.min(parseInt(digitos.slice(2).padStart(2, '0'), 10), 59)
-
-            divInput.value = formatar(min * 60 + seg)
-        }
-
-        // Fecha o input e devolve o <span> do relógio ao DOM.
-        // salvar = true  -> aplica o novo tempo (se for válido)
-        // salvar = false -> descarta a edição
-        function encerrarEdicao(salvar) {
-            if (encerrado) return
-            encerrado = true
-
-            if (salvar) {
-                const novoTempo = converterParaSegundos(divInput.value.trim())
-
-                if (novoTempo !== null) {
-                    totalSegundos = novoTempo
-                    tempoInicial = novoTempo
-                }
-            }
-
-            // Sempre reexibe o tempo atual (novo ou antigo)
-            timer.textContent = formatar(totalSegundos)
-            divInput.replaceWith(timer)
-
-            atualizarAnel()
-            atualizarMiniatura()
-        }
-
-        // Clicou fora: aplica se for válido, senão descarta.
-        // (Antes o input ficava preso na tela e o relógio sumia.)
-        divInput.addEventListener('blur', () => {
-            completarValor()
-            encerrarEdicao(true)
-        })
-
-        divInput.addEventListener('keydown', (e) => {
-
-            if (e.key === 'Enter') {
-                completarValor()
-                if (converterParaSegundos(divInput.value.trim()) === null) {
-                    divInput.focus()
+            function completarValor() {
+                const digitos = divInput.value.replace(/\D/g, '')
+                if (!digitos) {
+                    divInput.value = ''
                     return
                 }
+                const min = parseInt(digitos.slice(0, 2), 10)
+                const seg = Math.min(parseInt(digitos.slice(2).padStart(2, '0'), 10), 59)
 
+                divInput.value = formatar(min * 60 + seg)
+            }
+            function encerrarEdicao(salvar) {
+                if (encerrado) return
+                encerrado = true
+
+                if (salvar) {
+                    const novoTempo = converterParaSegundos(divInput.value.trim())
+
+                    if (novoTempo !== null) {
+                        totalSegundos = novoTempo
+                        tempoInicial = novoTempo
+                    }
+                }
+
+
+                timer.textContent = formatar(totalSegundos)
+                divInput.replaceWith(timer)
+
+                atualizarAnel()
+                atualizarMiniatura()
+            }
+            divInput.addEventListener('blur', () => {
+                completarValor()
                 encerrarEdicao(true)
-            }
+            })
 
-            if (e.key === 'Escape') {
-                encerrarEdicao(false)
-            }
+            divInput.addEventListener('keydown', (e) => {
+
+                if (e.key === 'Enter') {
+                    completarValor()
+                    if (converterParaSegundos(divInput.value.trim()) === null) {
+                        divInput.focus()
+                        return
+                    }
+
+                    encerrarEdicao(true)
+                }
+
+                if (e.key === 'Escape') {
+                    encerrarEdicao(false)
+                }
+            })
         })
-    })
-}
+    }
 
 // =====================================================================
 // BOTÃO START / PAUSE
 // =====================================================================
 
-buttonStart.addEventListener('click', () => {
-    if (intervalo !== null) {
-        pausar()
-        buttonStart.textContent = 'Start'
-    } else {
-        iniciar()
-        buttonStart.textContent = 'Pause'
-    }
-})
+    buttonStart.addEventListener('click', () => {
+        if (intervalo !== null) {
+            pausar()
+            buttonStart.textContent = 'Start'
+        } else {
+            iniciar()
+            buttonStart.textContent = 'Pause'
+        }
+    })
 
 // =====================================================================
 // INICIALIZAÇÃO
 // =====================================================================
 
-inputTimer()
-atualizarAnel()
-atualizarMiniatura()
-
-// OPÇÃO 2: Quando o painel do timer fecha (transição de opacity termina),
-// o botão é atualizado para mostrar o tempo
-// COMO FOI FEITO: Adicionado listener no transitionend do tipoTimer para
-// chamar atualizarBotaoTimer() assim que o painel desaparecer, garantindo
-// que o botão mostre o tempo "MM:SS" ao lado do ícone.
-if (tipoTimer) {
-    tipoTimer.addEventListener('transitionend', (e) => {
-        if (e.propertyName === 'opacity') {
-            atualizarBotaoTimer()
-        }
-    })
-}
-
-// OPÇÃO 2: Limpeza atualizada — não há mais <span> miniatura para remover
-// COMO FOI FEITO: Removida a linha `miniaturaPomodoro.remove()` porque a miniatura
-// agora é o próprio buttonTimer, que faz parte do DOM da tarefa e será removido
-// junto com o elemento <li> quando a tarefa for deletada.
-// Resta apenas parar o intervalo e restaurar o botão ao estado original.
-return function destruir() {
-    clearInterval(intervalo)
-    intervalo = null
-    // Restaurar o botão ao ícone original, caso ainda exista
-    if (buttonTimer) {
-        buttonTimer.innerHTML = buttonTimerHTMLOriginal
-        buttonTimer.classList.remove('pomodoroAtivo')
+    inputTimer()
+    atualizarAnel()
+    atualizarMiniatura()
+    if (tipoTimer) {
+        tipoTimer.addEventListener('transitionend', (e) => {
+            if (e.propertyName === 'opacity') {
+                atualizarBotaoTimer()
+            }
+        })
     }
-}
+
+    return function destruir() {
+        clearInterval(intervalo)
+        intervalo = null
+        if (buttonTimer) {
+            buttonTimer.innerHTML = buttonTimerHTMLOriginal
+            buttonTimer.classList.remove('pomodoroAtivo')
+        }
+    }
 }
 
 
@@ -728,6 +737,10 @@ document.addEventListener('click', (e) => {
         }
     });
 });
+
+
+
+
 
 // Adiciona a tarefa ao final da lista
 function adicionarTarefaNaLista(tarefa, lista) {
