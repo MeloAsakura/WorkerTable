@@ -24,6 +24,7 @@ function criarTarefa(titulo, lista) {
     configuracaoBotaoTimer(elementos);
     opcaoDeTimer(elementos);
     criarPomodoro(elementos)
+    criarHoraInicioEfim(elementos)
 
 
     adicionarTarefaNaLista(tarefa, lista);
@@ -278,42 +279,13 @@ function criarPomodoro(elementos) {
         contador(pomodoro)
     })
 }
-
-
-function timerHora(elementos){
-    const {tipoTimer, timerHora, buttonTimer} = elementos
-
-    if(!tipoTimer.classList.contains('aberto') && !tipoTimer.classList.contains('expandido')) return
-
-    const hora = document.createElement('div')
-    hora.classList.add('hora')
-    hora.style.width='20px'
-    hora.style.height='20px'
-    hora.style.background='black'
-    hora.style.position='absolute'
-
-    tipoTimer.append(hora)
-}
-
-/**
- * Inicializa um timer Pomodoro dentro de um elemento.
- *
- * Estrutura HTML esperada dentro de `elemento`:
- *   .relogio > .tempo   -> texto no formato "MM:SS" (ex.: "25:00")
- *   .botaoStart         -> botão Start/Pause
- *   .progresso          -> <circle> do SVG usado como anel de progresso
- *
- * Retorna uma função `destruir()` que deve ser chamada quando a tarefa for
- * removida da tela (para parar o timer e remover a miniatura do DOM).
- */
 function contador(elemento) {
 
     // =====================================================================
-    // FUNÇÕES AUXILIARES (puras, não dependem do estado do timer)
+    // FUNÇÕES AUXILIARES
     // ====================================================================
 
-    // Converte segundos totais em "MM:SS". Ex.: 90 -> "01:30"
-    // (nomes min/seg evitam sombrear as variáveis de fora)
+    // Converte segundos totais em "MM:SS". Ex: 90 -> "01:30"
     function formatar(total) {
         const min = Math.floor(total / 60)
         const seg = total % 60
@@ -355,20 +327,16 @@ function contador(elemento) {
     const buttonStart = divPomodoro.querySelector('.botaoStart')
     const progresso = divPomodoro.querySelector('.progresso')
 
-    // OPÇÃO 2: Referência ao botão do timer e painel para transformar o botão em miniatura
-    // Em vez de criar um <span> separado, o próprio buttonTimer mostra o tempo
     const liTarefa = divPomodoro.closest('li')
     const buttonTimer = liTarefa ? liTarefa.querySelector('.buttonTimer') : null
     const tipoTimer = liTarefa ? liTarefa.querySelector('.tipoTimer') : null
-    // Guardamos o HTML original do botão para restaurar quando o painel abrir
+
     const buttonTimerHTMLOriginal = buttonTimer ? buttonTimer.innerHTML : ''
 
     // =====================================================================
     // ESTADO
     // =====================================================================
 
-    // Lê o tempo inicial do HTML. Se estiver inválido ou "00:00",
-    // usa 25:00 como padrão (evita divisão por zero / NaN no anel).
     const TEMPO_PADRAO = 25 * 60
     let tempoInicial = converterParaSegundos(timer.textContent.trim()) ?? TEMPO_PADRAO
     let totalSegundos = tempoInicial
@@ -676,6 +644,52 @@ function contador(elemento) {
         }
     }
 }
+//
+// function criarHoraInicioEfim(elementos){
+//     const{horario,tipoTimer, titulo} = elementos
+//
+//     const inputHoraInicio = horario.querySelector('.inputHoraInicio')
+//     const inputHoraFim = horario.querySelector('.inputHoraFim')
+//
+//     const buttonAddHora = document.createElement('button')
+//     horario.append(buttonAddHora)
+//
+//     const spanHora = document.createElement('span')
+//     titulo.insertAdjacentElement('afterend', spanHora)
+//
+//     function conversorMinutos(valor){
+//         const [horas,minutos] = valor.split(":").map(Number)
+//         return horas * 60 + minutos
+//     }
+//     function validarHoras(){
+//         if(!inputHoraInicio ||! inputHoraFim) return
+//
+//         const inicio = conversorMinutos(inputHoraInicio.value)
+//         const fim = conversorMinutos(inputHoraFim.value)
+//
+//         if(fim < inicio){
+//             const temp = inputHoraInicio.value
+//             inputHoraInicio.value=inputHoraFim.value
+//             inputHoraFim.value=temp
+//         }
+//
+//         return {
+//             inicio : inputHoraInicio.value,
+//             fim: inputHoraFim.value
+//         }
+//     }
+//
+//     function attTextoHora(){
+//         const hora = validarHoras()
+//         spanHora.textContent = hora ?  ` ${hora.inicio} - ${hora.fim}` : ""
+//     }
+//     inputHoraInicio.addEventListener('change', validarHoras)
+//     inputHoraFim.addEventListener('change', validarHoras)
+//     buttonAddHora.addEventListener('click',attTextoHora)
+//
+//     if (tipoTimer.classList.contains('aberto')) attTextoHora()
+//
+// }
 
 
 //========================================================================================//

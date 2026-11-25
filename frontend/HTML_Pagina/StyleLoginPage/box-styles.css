@@ -478,9 +478,10 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
-    padding: 6px;
+    padding: 6px 1px 1px 6px;
     width: 180px;
     height: 88px;
+    place-items: center;
 
     border: 1px solid var(--cor-borda);
     border-radius: 10px;
@@ -552,7 +553,7 @@ overflow-y: auto;
 .opcaoPomodoro,
 .timerHora {
     flex: 1;
-    width: 100%;
+    width: 150px;
     height: 36px;
     background: white;
     color: var(--cor-texto);
@@ -702,6 +703,23 @@ overflow-y: auto;
     transition: stroke-dashoffset 1s linear;
 }
 
+.horario{
+
+}
+.horario::-webkit-scrollbar{
+    opacity: 0;
+}
+
+.labelHoraInicio.LabelHoraFim{
+    font-size: 1.10rem;
+    color: var(--cor-texto-suave);
+}
+::-webkit-scrollbar{
+    opacity: 0;
+}
+.horario .horaInicio{
+    margin-bottom: 10px;
+}
     /* .miniaturaPomodoro removido — OPÇÃO 2: o botão do timer agora é a miniatura */
 
 
