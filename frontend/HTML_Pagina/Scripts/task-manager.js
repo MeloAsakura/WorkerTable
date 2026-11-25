@@ -24,7 +24,7 @@ function criarTarefa(titulo, lista) {
     configuracaoBotaoTimer(elementos);
     opcaoDeTimer(elementos);
     criarPomodoro(elementos)
-    criarHoraInicioEfim(elementos)
+    criarHora(elementos)
 
 
     adicionarTarefaNaLista(tarefa, lista);
@@ -690,6 +690,68 @@ function contador(elemento) {
 //     if (tipoTimer.classList.contains('aberto')) attTextoHora()
 //
 // }
+
+
+
+
+
+function criarHora(elementos){
+    const{horario,tipoTimer, titulo} = elementos
+
+    const inicio = horario.querySelector('.inputHoraInicio')
+    const fim = horario.querySelector('.inputHoraFim')
+    if(!inicio || !fim) return
+
+    const buttonAddHora = document.createElement('button')
+    buttonAddHora.type='button'
+    buttonAddHora.classList.add('buttonAddHora')
+    horario.append(buttonAddHora)
+
+    const span = document.createElement('span')
+    titulo.insertAdjacentElement('afterend',span)
+
+    function formataHora(valor){
+        const [h, m] = valor.split(":").map(Number)
+        return h * 60 + m
+    }
+
+    function validarHora(){
+        if(!inicio || !fim) return
+
+        let valorInicio = formataHora(inicio.value)
+        let valorFim = formataHora(fim.value)
+
+        if(valorFim < valorInicio){
+            const temp= valorFim
+            valorFim = valorInicio
+            valorInicio= temp
+        }
+        return {
+            i: valorInicio,
+            f: valorFim
+        }
+    }
+
+    function attTextoHora(){
+        const hora = validarHora()
+        span.textContent = hora?`${hora.i}: ${hora.f}` :""
+    }
+
+    inicio.addEventListener('input',formataHora)
+    fim.addEventListener('input',formataHora)
+    buttonAddHora.addEventListener('click',attTextoHora)
+    if(tipoTimer.classList.contains('aberto'))attTextoHora()
+}
+
+
+
+
+
+
+
+
+
+
 
 
 //========================================================================================//
