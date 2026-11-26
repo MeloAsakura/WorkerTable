@@ -552,6 +552,7 @@ overflow-y: auto;
 
 .opcaoPomodoro,
 .timerHora {
+    position: relative;
     flex: 1;
     width: 150px;
     height: 36px;
@@ -703,19 +704,29 @@ overflow-y: auto;
     transition: stroke-dashoffset 1s linear;
 }
 
-.horario{
-
-}
 .horario::-webkit-scrollbar{
     opacity: 0;
+}
+.buttonAddHora{
+    position: absolute;
+    bottom: 85%;
+    left: 86%;
+    align-items: center;
+    width: 15px;
+    height: 15px;
+    border-radius: 4px;
+    border: 1px solid var(--cor-borda);
+    transition: background-color .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+.buttonAddHora:hover{
+    background: green;
+    transform: scale(1.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .12);
 }
 
 .labelHoraInicio.LabelHoraFim{
     font-size: 1.10rem;
     color: var(--cor-texto-suave);
-}
-::-webkit-scrollbar{
-    opacity: 0;
 }
 .horario .horaInicio{
     margin-bottom: 10px;

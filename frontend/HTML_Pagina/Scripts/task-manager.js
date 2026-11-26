@@ -644,56 +644,6 @@ function contador(elemento) {
         }
     }
 }
-//
-// function criarHoraInicioEfim(elementos){
-//     const{horario,tipoTimer, titulo} = elementos
-//
-//     const inputHoraInicio = horario.querySelector('.inputHoraInicio')
-//     const inputHoraFim = horario.querySelector('.inputHoraFim')
-//
-//     const buttonAddHora = document.createElement('button')
-//     horario.append(buttonAddHora)
-//
-//     const spanHora = document.createElement('span')
-//     titulo.insertAdjacentElement('afterend', spanHora)
-//
-//     function conversorMinutos(valor){
-//         const [horas,minutos] = valor.split(":").map(Number)
-//         return horas * 60 + minutos
-//     }
-//     function validarHoras(){
-//         if(!inputHoraInicio ||! inputHoraFim) return
-//
-//         const inicio = conversorMinutos(inputHoraInicio.value)
-//         const fim = conversorMinutos(inputHoraFim.value)
-//
-//         if(fim < inicio){
-//             const temp = inputHoraInicio.value
-//             inputHoraInicio.value=inputHoraFim.value
-//             inputHoraFim.value=temp
-//         }
-//
-//         return {
-//             inicio : inputHoraInicio.value,
-//             fim: inputHoraFim.value
-//         }
-//     }
-//
-//     function attTextoHora(){
-//         const hora = validarHoras()
-//         spanHora.textContent = hora ?  ` ${hora.inicio} - ${hora.fim}` : ""
-//     }
-//     inputHoraInicio.addEventListener('change', validarHoras)
-//     inputHoraFim.addEventListener('change', validarHoras)
-//     buttonAddHora.addEventListener('click',attTextoHora)
-//
-//     if (tipoTimer.classList.contains('aberto')) attTextoHora()
-//
-// }
-
-
-
-
 
 function criarHora(elementos){
     const{horario,tipoTimer, titulo} = elementos
@@ -708,37 +658,44 @@ function criarHora(elementos){
     horario.append(buttonAddHora)
 
     const span = document.createElement('span')
+    span.classList.add('spanHoras')
     titulo.insertAdjacentElement('afterend',span)
 
-    function formataHora(valor){
-        const [h, m] = valor.split(":").map(Number)
+    function horaParaMinutos(valor){
+        if(!valor) return null
+
+        const [h, m] = valor.split(':').map(Number)
         return h * 60 + m
     }
 
-    function validarHora(){
-        if(!inicio || !fim) return
+    function minutosParaHora(valor){
+        const h = Math.floor(valor / 60)
+        const m = valor % 60
+        return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`
+    }
 
-        let valorInicio = formataHora(inicio.value)
-        let valorFim = formataHora(fim.value)
+
+
+    function validarHora(){
+
+        let valorInicio = horaParaMinutos(inicio.value)
+        let valorFim = horaParaMinutos(fim.value)
+
+        if(valorInicio === null || valorFim === null) return null
 
         if(valorFim < valorInicio){
-            const temp= valorFim
-            valorFim = valorInicio
-            valorInicio= temp
+            [valorInicio, valorFim] = [valorFim, valorInicio]
         }
         return {
-            i: valorInicio,
-            f: valorFim
+            i:minutosParaHora(valorInicio),
+            f:minutosParaHora(valorFim),
         }
     }
 
     function attTextoHora(){
         const hora = validarHora()
-        span.textContent = hora?`${hora.i}: ${hora.f}` :""
+        span.textContent = hora?`${hora.i} - ${hora.f}` :""
     }
-
-    inicio.addEventListener('input',formataHora)
-    fim.addEventListener('input',formataHora)
     buttonAddHora.addEventListener('click',attTextoHora)
     if(tipoTimer.classList.contains('aberto'))attTextoHora()
 }
