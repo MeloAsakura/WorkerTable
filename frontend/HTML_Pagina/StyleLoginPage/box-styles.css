@@ -307,7 +307,6 @@
     anchor-name: --opcoes;
     flex: none;
     flex-shrink: 0;
-    /* margin-left: auto removido — OPÇÃO C: o .botoesGrupo já posiciona à direita */
     width: 28px;
     height: 28px;
     padding: 0 2px;
@@ -357,11 +356,14 @@
 .newBoxTable .acoes {
     position: fixed;
     position-anchor: --opcoes;
-    top: calc(anchor(bottom) + 4px); /* logo abaixo do botão */
-    right: anchor(right); /* alinhado à direita do botão */
-    position-visibility: anchors-visible;
-    position: fixed;
+    top: calc(anchor(bottom) + 4px);
+    right: anchor(right);
+    position-visibility: anchor-visible;
+    isolation: isolate;
 
+
+    z-index: 1001;
+    background-color: #fff;
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -369,13 +371,28 @@
     min-width: 180px;
     border: 1px solid var(--cor-borda);
     border-radius: 10px;
-    background: #fff;
+    opacity: 0;
     box-shadow: 0 4px 16px rgba(0, 0, 0, .12), 0 1px 4px rgba(0, 0, 0, .08);
     pointer-events: none;
-    opacity: 0;
     transform: translateY(-6px) scale(.96);
     transform-origin: top right;
     transition: opacity .15s ease, transform .2s ease;
+}
+
+.newBoxTable:has(.textoTopo.opcoes-abertas) {
+    z-index: 9999;
+}
+
+.newBoxTable:has(.tipoTimer.aberto, .tipoTimer.expandido) {
+    z-index: 9999;
+}
+
+.newBoxTable .textoTopo.opcoes-abertas {
+    z-index: 1000;
+}
+
+.newBoxTable .textoTopo:has(.tipoTimer.aberto, .tipoTimer.expandido) {
+    z-index: 1001;
 }
 
 /* Dropdown aberto */
@@ -383,7 +400,7 @@
     pointer-events: auto;
     opacity: 1;
     transform: translateY(0) scale(1);
-    z-index: 100;
+    background-color: white;
 }
 
 .newBoxTable .acaoItem {
@@ -403,6 +420,7 @@
     align-items: center;
     gap: 8px;
     transition: background-color .12s ease, color .12s ease;
+
 }
 
 .newBoxTable .acaoItem:hover {
@@ -473,7 +491,7 @@
     top: calc(anchor(bottom) + 4px);
     right: anchor(right);
 
-    position-visibility: anchors-visible;
+    position-visibility: anchor-visible;
 
     display: flex;
     flex-direction: column;
@@ -482,6 +500,7 @@
     width: 180px;
     height: 88px;
     place-items: center;
+
 
     border: 1px solid var(--cor-borda);
     border-radius: 10px;
@@ -509,10 +528,9 @@
     pointer-events: auto;
     opacity: 1;
     transform: translateY(0) scale(1);
-    z-index: 100;
-    font-family: Space Grotesk, serif;
+    z-index: 1002;
 
-    background: #fff;
+    font-family: 'Space Grotesk', serif;
     border-radius: 8px;
 }
 
@@ -521,7 +539,7 @@
     pointer-events: auto;
     opacity: 1;
     transform: translateY(0) scale(1);
-    z-index: 100;
+    z-index: 9999;
 }
 
 .tipoTimer {
@@ -529,17 +547,20 @@
     flex-direction: row;
     gap: 3px;
     width: 120px;
-overflow-y: auto;
-    overflow-x:hidden ;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
+
 .containerTimer .tipoTimer::-webkit-scrollbar {
     width: 5px;
     height: 5px;
 }
+
 .containerTimer .tipoTimer::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 4px;
 }
+
 .containerTimer .tipoTimer::-webkit-scrollbar-thumb {
     background: #c1c1c1;
     border-radius: 1px;
@@ -632,19 +653,20 @@ overflow-y: auto;
     background: transparent;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
-.pomodoro .ciclos .circuloDeCiclo.concluido{
-    background:darkolivegreen;
+
+.pomodoro .ciclos .circuloDeCiclo.concluido {
+    background: darkolivegreen;
 }
 
 .relogio {
-    position: relative;      /* referência para o anel e o texto */
+    position: relative; /* referência para o anel e o texto */
     width: 120px;
-    aspect-ratio: 1;         /* altura = largura (quadrado) */
+    aspect-ratio: 1; /* altura = largura (quadrado) */
 }
 
 .anel {
     position: absolute;
-    inset: 0;                /* ocupa o .relogio inteiro */
+    inset: 0; /* ocupa o .relogio inteiro */
     width: 100%;
     height: 100%;
     transform: rotate(-90deg);
@@ -654,16 +676,17 @@ overflow-y: auto;
     position: absolute;
     inset: 0;
     display: grid;
-    place-items: center;     /* centraliza o texto no círculo */
+    place-items: center; /* centraliza o texto no círculo */
 }
 
-.botaoStart{
+.botaoStart {
     position: absolute;
     bottom: 25px;
     background: transparent;
     border: none;
     opacity: 0.5;
 }
+
 .relogio .divInputPomodoro {
     position: absolute;
     margin: auto;
@@ -684,10 +707,11 @@ overflow-y: auto;
 .divInputPomodoro:focus {
     background: transparent;
     color: black;
-    border:0;
+    border: 0;
     outline: none;
     box-shadow: none
 }
+
 .anel circle {
     fill: none;
     stroke-width: 6;
@@ -704,34 +728,44 @@ overflow-y: auto;
     transition: stroke-dashoffset 1s linear;
 }
 
-.horario::-webkit-scrollbar{
+.horario::-webkit-scrollbar {
     opacity: 0;
 }
-.buttonAddHora{
+
+.buttonAddHora {
+    display: flex;
+    justify-content: center;
+    font-size: 12px;
+    color: black;
     position: absolute;
     bottom: 85%;
     left: 86%;
     align-items: center;
     width: 15px;
     height: 15px;
-    border-radius: 4px;
+    border-radius: 5px;
     border: 1px solid var(--cor-borda);
     transition: background-color .15s ease, transform .15s ease, box-shadow .15s ease;
 }
-.buttonAddHora:hover{
-    background: green;
+
+.buttonAddHora:hover {
+    justify-content: center;
+    color: white;
+    background:darkolivegreen;
     transform: scale(1.1);
     box-shadow: 0 2px 6px rgba(0, 0, 0, .12);
 }
 
-.labelHoraInicio.LabelHoraFim{
+.labelHoraInicio.LabelHoraFim {
     font-size: 1.10rem;
     color: var(--cor-texto-suave);
 }
-.horario .horaInicio{
+
+.horario .horaInicio {
     margin-bottom: 10px;
 }
-    /* .miniaturaPomodoro removido — OPÇÃO 2: o botão do timer agora é a miniatura */
+
+/* .miniaturaPomodoro removido — OPÇÃO 2: o botão do timer agora é a miniatura */
 
 
 /* ============================================================== */
@@ -813,11 +847,11 @@ overflow-y: auto;
     gap: 6px;
     width: 100%;
 }
+
 .newBoxTable .newListaDeTarefasTemplate li {
-    transition:
-            background-color 0.4s ease,
-            border-color 0.4s ease,
-            box-shadow 0.4s ease;
+    transition: background-color 0.4s ease,
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
 }
 
 .newBoxTable .newListaDeTarefasTemplate li.tarefaConcluida {
@@ -826,12 +860,15 @@ overflow-y: auto;
     box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
 }
 
+/*==================== Painel de datas e descrição ====================*/
+
+/* Superfície suave: fundo claro, borda fina e anel de foco no destaque */
 .newBoxTable .datasInicioeFim {
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-end;
+    align-items: stretch;
     justify-content: center;
-    gap: 20px;
+    gap: 12px;
     width: 100%;
 }
 
@@ -839,13 +876,16 @@ overflow-y: auto;
 .newBoxTable .campoDescricao {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 0 10px;
-    border: none;
-
-    background: transparent;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 12px;
+    background: var(--cor-campo);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9),
+    0 1px 2px rgba(27, 36, 51, .04);
     color: var(--cor-texto);
-    transition: background-color .15s ease, color .15s ease;
+    transition: border-color .18s ease, background-color .18s ease,
+    box-shadow .18s ease;
 }
 
 .newBoxTable .campoData svg,
@@ -853,36 +893,38 @@ overflow-y: auto;
     width: 16px;
     height: 16px;
     flex-shrink: 0;
-    color: var(--cor-texto-suave);
+    color: var(--cor-primaria);
+    opacity: .7;
     pointer-events: none;
-    transition: color .15s ease;
+    transition: opacity .18s ease, transform .18s ease;
 }
 
 .newBoxTable .campoData:hover,
 .newBoxTable .campoDescricao:hover {
-    background: var(--cor-primaria-suave);
-}
-
-.newBoxTable .campoData:hover svg,
-.newBoxTable .campoDescricao:hover svg {
-    color: var(--cor-primaria);
+    border-color: rgba(47, 84, 184, .35);
+    background: #fff;
 }
 
 .newBoxTable .campoData:focus-within,
 .newBoxTable .campoDescricao:focus-within {
-    background: var(--cor-primaria-suave);
+    border-color: var(--cor-primaria);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(47, 84, 184, .14);
 }
 
 .newBoxTable .campoData:focus-within svg,
 .newBoxTable .campoDescricao:focus-within svg {
-    color: var(--cor-primaria);
+    opacity: 1;
+    transform: scale(1.08);
 }
 
 .newBoxTable .campoData {
-    max-width: 180px;
+    flex: 1 1 140px;
+    max-width: 190px;
 }
 
 .newBoxTable .campoDescricao {
+    flex: 1 1 100%;
     max-width: 100%;
 }
 
@@ -892,16 +934,17 @@ overflow-y: auto;
     box-sizing: border-box;
     width: 100%;
     min-width: 0;
-    height: 32px;
-    padding: 0 8px;
-    border: none;
-    border-radius: 0;
-    outline: none;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    outline: 0;
     background: transparent;
     color: var(--cor-texto);
     font-family: inherit;
     font-size: .82rem;
     font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .01em;
     cursor: text;
 }
 
@@ -912,17 +955,9 @@ overflow-y: auto;
     font-weight: 400;
 }
 
-.newBoxTable.inputDescricao:focus {
-    border: none;
-    outline: none;
-    box-shadow: none;
-}
-
 .newBoxTable .descricaoNotes {
     width: 100%;
-    margin-top: 8px;
-    padding: 6px 0;
-    border: transparent;
+    margin-top: 10px;
 }
 
 /*==================== Atributo hidden ====================*/

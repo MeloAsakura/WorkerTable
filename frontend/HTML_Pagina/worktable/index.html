@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>WorkTable — Quadro de trabalho</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<div class="app">
+    <aside class="rail" aria-label="Navegação do espaço de trabalho">
+        <div class="marca" title="WorkTable">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="7" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.7"/>
+                <rect x="14" y="3" width="7" height="7" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.7"/>
+                <rect x="3" y="14" width="7" height="7" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.7"/>
+                <rect x="14" y="14" width="7" height="7" rx="1.6" fill="currentColor"/>
+            </svg>
+        </div>
+
+        <nav class="rail-nav" aria-label="Filtros do quadro">
+            <button type="button" class="rail-item" data-view="quadro" aria-pressed="true">
+                <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+                </svg>
+                <span>Quadro</span>
+            </button>
+            <button type="button" class="rail-item" data-view="hoje" aria-pressed="false">
+                <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="18" rx="2.5"/><path d="M8 2v4M16 2v4M3 10h18"/><path d="M12 14v3l2 1"/>
+                </svg>
+                <span>Hoje</span>
+            </button>
+            <button type="button" class="rail-item" data-view="concluidas" aria-pressed="false">
+                <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.4 2.4 4.6-5"/>
+                </svg>
+                <span>Feitas</span>
+            </button>
+        </nav>
+
+        <div class="rail-stats" aria-label="Progresso do quadro">
+            <div class="anel-progresso" id="anelProgresso" style="--p:0">
+                <span id="anelTexto">0%</span>
+            </div>
+            <small id="statsResumo">0 de 0 tarefas</small>
+        </div>
+
+        <div class="rail-rodape">
+            <button type="button" class="btn-foco-rail" id="btnFocoRail">
+                <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+                </svg>
+                <span>Foco</span>
+            </button>
+            <div class="avatar" title="Conta de demonstração">WT</div>
+        </div>
+    </aside>
+
+    <main class="palco">
+        <header class="topo">
+            <div class="topo-titulo">
+                <p class="sobrescrito">Quadro <span aria-hidden="true">/</span> <b id="dataHoje"></b></p>
+                <input id="tituloQuadro" class="titulo-quadro" value="Lançamento do site" aria-label="Nome do quadro" maxlength="60" spellcheck="false">
+            </div>
+
+            <div class="topo-acoes">
+                <button type="button" class="pilula-foco" id="pilulaFoco" data-ativa="false" title="Abrir modo foco">
+                    <span class="ponto" aria-hidden="true"></span>
+                    <span id="pilulaTempo">25:00</span>
+                </button>
+
+                <label class="busca">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/>
+                    </svg>
+                    <input type="search" id="busca" placeholder="Buscar tarefas" aria-label="Buscar tarefas" autocomplete="off">
+                </label>
+
+                <button type="button" class="atalho" id="btnComando" aria-label="Abrir comandos">
+                    <kbd>Ctrl</kbd><kbd>K</kbd>
+                </button>
+
+                <button type="button" class="botao-primario" id="btnNovaCaixa">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    Nova caixa
+                </button>
+            </div>
+        </header>
+
+        <section class="quadro" id="quadro" aria-label="Quadro de trabalho">
+            <div class="quadro-interno" id="quadroInterno">
+                <div class="quadro-vazio" id="quadroVazio" hidden>
+                    <div class="vazio-cartao">
+                        <span class="vazio-marca" aria-hidden="true">⌗</span>
+                        <h2 id="vazioTitulo">Nenhuma tarefa por aqui</h2>
+                        <p id="vazioTexto">Crie uma caixa ou limpe a busca para voltar ao quadro completo.</p>
+                        <button type="button" class="botao-primario" id="btnVazioAcao">Nova caixa</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- Painel de foco -->
+<div class="veu" id="veu" hidden></div>
+<aside class="painel-foco" id="painelFoco" data-aberto="false" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Modo foco" inert>
+    <div class="foco-topo">
+        <div>
+            <p class="foco-rotulo" id="focoRotulo">Modo foco</p>
+            <p class="foco-sub" id="focoSub">Uma tarefa por vez, sem ruído.</p>
+        </div>
+        <button type="button" class="botao-icone" id="btnFecharFoco" aria-label="Fechar modo foco">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                <path d="M6 6l12 12M18 6 6 18"/>
+            </svg>
+        </button>
+    </div>
+
+    <div class="foco-dial">
+        <svg viewBox="0 0 220 220" class="foco-svg" aria-hidden="true">
+            <circle class="foco-trilho" cx="110" cy="110" r="92"/>
+            <circle class="foco-progresso" id="focoProgresso" cx="110" cy="110" r="92"/>
+        </svg>
+        <div class="foco-ponteiro" id="focoPonteiro" aria-hidden="true"><span></span></div>
+        <div class="foco-tempo">
+            <strong id="focoTempo">25:00</strong>
+            <span id="focoEstado">Pronto para começar</span>
+        </div>
+    </div>
+
+    <div class="foco-presets" role="group" aria-label="Duração da sessão">
+        <button type="button" data-min="25" class="ativo">25 min</button>
+        <button type="button" data-min="50">50 min</button>
+        <button type="button" data-min="90">90 min</button>
+    </div>
+
+    <div class="foco-acoes">
+        <button type="button" class="botao-primario largo" id="btnIniciarFoco">Iniciar foco</button>
+        <button type="button" class="botao-secundario" id="btnReiniciarFoco">Reiniciar</button>
+    </div>
+
+    <p class="foco-dica">O relógio continua mesmo com o painel fechado. Ao terminar, faça uma pausa de 5 minutos.</p>
+</aside>
+
+<!-- Paleta de comandos -->
+<div class="paleta-veu" id="paletaVeu" hidden></div>
+<div class="paleta" id="paleta" role="dialog" aria-modal="true" aria-label="Comandos do WorkTable" hidden>
+    <div class="paleta-campo">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/>
+        </svg>
+        <input id="paletaBusca" type="text" placeholder="Digite um comando ou tarefa…" aria-label="Buscar comandos e tarefas" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="paletaLista" aria-autocomplete="list">
+        <kbd>Esc</kbd>
+    </div>
+    <ul class="paleta-lista" id="paletaLista" role="listbox" aria-label="Resultados"></ul>
+    <div class="paleta-rodape">
+        <span><kbd>↑</kbd><kbd>↓</kbd> navegar</span>
+        <span><kbd>Enter</kbd> executar</span>
+        <span><kbd>Esc</kbd> fechar</span>
+    </div>
+</div>
+
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

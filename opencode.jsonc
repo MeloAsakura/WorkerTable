@@ -1,4 +1,19 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "default_agent": "aristoteles"
+  "default_agent": "aristoteles",
+  "agents": {
+    "michelangelo": {
+      "description": "Especialista em arquitetura visual, UI/UX e estilização front-end",
+      "mode": "all",
+      "color": "#FF5733",
+      "system": "Você é o Michelangelo, um arquiteto de interfaces e especialista em design e front-end. Foque em código limpo, responsividade, acessibilidade e fidelidade visual.",
+      "permissions": [
+        {
+          "action": "edit",
+          "resource": "*",
+          "effect": "allow"
+        }
+      ]
+    }
+  }
 }

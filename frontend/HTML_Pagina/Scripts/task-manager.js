@@ -193,6 +193,7 @@ function configuracaoBotaoTimer(elementos) {
         if (tipoTimer.classList.contains('aberto')) {
             fecharTimer(elementos);
         } else {
+            definirTarefaAtiva(elementos);
             tipoTimer.classList.add('aberto');
         }
     });
@@ -654,6 +655,7 @@ function criarHora(elementos){
 
     const buttonAddHora = document.createElement('button')
     buttonAddHora.type='button'
+    buttonAddHora.textContent='✓'
     buttonAddHora.classList.add('buttonAddHora')
     horario.append(buttonAddHora)
 
@@ -749,29 +751,42 @@ function alternarOpcoes(textoTopo, botaoOpcoes) {
     botaoOpcoes.setAttribute('aria-expanded', String(isOpen));
 }
 
+// Fecha o menu de ações de uma tarefa e sincroniza o aria-expanded
+function fecharAcoes(textoTopo) {
+    textoTopo.classList.remove('opcoes-abertas');
+    const botao = textoTopo.querySelector('.buttonOpcoes');
+    if (botao) botao.setAttribute('aria-expanded', 'false');
+}
+
+// Escolhe a tarefa ativa: fecha ações e timers de todas as outras tarefas
+function definirTarefaAtiva(elementos) {
+    document.querySelectorAll('.textoTopo.opcoes-abertas').forEach(textoTopo => {
+        if (!textoTopo.contains(elementos.li)) fecharAcoes(textoTopo);
+    });
+
+    document.querySelectorAll('.tipoTimer.aberto, .tipoTimer.expandido').forEach(tipoTimer => {
+        if (tipoTimer.closest('li') !== elementos.li) fecharTimer({tipoTimer});
+    });
+}
+
 // Configura o botão de opções
 function configurarOpcoes(elementos) {
-    const {botaoOpcoes, areaAcoes, li} = elementos;
+    const {botaoOpcoes, areaAcoes} = elementos;
     botaoOpcoes.setAttribute('aria-expanded', 'false');
     botaoOpcoes.addEventListener('click', (e) => {
         e.stopPropagation();
-        alternarOpcoes(areaAcoes.parentElement, botaoOpcoes);
+        const textoTopo = areaAcoes.parentElement;
+        if (!textoTopo.classList.contains('opcoes-abertas')) definirTarefaAtiva(elementos);
+        alternarOpcoes(textoTopo, botaoOpcoes);
     });
 }
 
 // Fecha todos os dropdowns abertos ao clicar fora
 document.addEventListener('click', (e) => {
-    // Fecha dropdowns de ações
     document.querySelectorAll('.textoTopo.opcoes-abertas').forEach(textoTopo => {
-        if (!textoTopo.contains(e.target)) {
-            textoTopo.classList.remove('opcoes-abertas');
-            const botao = textoTopo.querySelector('.buttonOpcoes');
-            if (botao) botao.setAttribute('aria-expanded', 'false');
-        }
+        if (!textoTopo.contains(e.target)) fecharAcoes(textoTopo);
     });
 });
-
-
 
 
 
