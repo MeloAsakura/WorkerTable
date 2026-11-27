@@ -21,6 +21,7 @@ function criarTarefa(titulo, lista) {
     configurarNotes(elementos);
     configurarDatas(elementos);
     configurarOpcoes(elementos);
+    configurarParticipantes(elementos);
     configuracaoBotaoTimer(elementos);
     opcaoDeTimer(elementos);
     criarPomodoro(elementos)
@@ -44,6 +45,8 @@ function obterElementosTarefa(li) {
         areaNotes: li.querySelector('.descricaoNotes'),
         inputNotes: li.querySelector('.inputDescricao'),
         resumoNotes: li.querySelector('.descricaoHidden'),
+
+        buttonParticipantes:li.querySelector('.buttonParticipantes'),
 
         buttonTimer: li.querySelector('.buttonTimer'),
         tipoTimer: li.querySelector('.tipoTimer'),
@@ -183,6 +186,40 @@ function atualizarResumoDatas(elementos) {
     resumoDatas.textContent = `Início: ${inicio || 'Não definido'} | Fim: ${fim || 'Não definido'}`;
     resumoDatas.hidden = false;
 }
+//============================PARTICIPANTES=================//
+
+function configurarParticipantes(elementos) {
+    const {buttonParticipantes,li} = elementos
+
+
+
+    function divDeParticipantes() {
+        const createDivParticipante = document.createElement('div')
+        const inputParticipantes = inputParticipante()
+
+        createDivParticipante.append(inputParticipantes)
+        createDivParticipante.classList.add('participantes');
+        createDivParticipante.style.background = 'black';
+        createDivParticipante.style.width = '20px';
+        createDivParticipante.style.height = '20px';
+
+        li.append(createDivParticipante);
+
+    }
+
+    function inputParticipante() {
+        const inputParticipantes = document.createElement('input');
+        inputParticipantes.classList.add('inputParticipantes');
+
+        return inputParticipantes
+    }
+
+    buttonParticipantes.addEventListener('click',divDeParticipantes)
+
+
+}
+
+
 
 
 //============================TIMER=========================//
@@ -701,13 +738,6 @@ function criarHora(elementos){
     buttonAddHora.addEventListener('click',attTextoHora)
     if(tipoTimer.classList.contains('aberto'))attTextoHora()
 }
-
-
-
-
-
-
-
 
 
 
