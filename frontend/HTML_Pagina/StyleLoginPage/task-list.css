@@ -1,19 +1,4 @@
-/* =====================================================================
-   SANDBOX (pasta transparente que guarda as miniaturas das boxes)
-   ---------------------------------------------------------------------
-   Estrutura do HTML:
 
-   <div class="SandBox">                 <- div externa (este bloco)
-       <div class="armazenamentoPasta">  <- guarda as boxes de verdade (escondidas)
-       <div class="miniaturasPasta">     <- div interna com as miniaturas
-   </div>
-
-   COMPORTAMENTO:
-   - Por padrão a SandBox tem altura automática e cresce com as miniaturas.
-   - Se você redimensionar (o JS grava height inline), a altura fica fixa
-     e as miniaturas rolam dentro do .miniaturasPasta.
-
-   ===================================================================== */
 .SandBox {
     position: absolute;
     left: 15px;
@@ -25,18 +10,16 @@
     display: flex;
     flex-direction: column;
 
-    padding: 16px;
+    padding: 16px; /* sem espaço reservado: a lombada só existe fechada */
     box-sizing: border-box;
 
-    background: rgba(255, 255, 255, .5);
-    -webkit-backdrop-filter: blur(10px) saturate(160%);
-    backdrop-filter: blur(10px) saturate(160%);
+    /* Papelaria, não vidro: uma única cor firme, sem grid de linhas */
+    background: #e8e1cd;
+    border: 1px solid rgba(0, 0, 0, .18);
+    border-radius: 14px;
 
-    border: 1px solid rgba(255, 255, 255, .45);
-    border-radius: 22px;
-
-    box-shadow: 0 8px 32px rgba(31, 38, 135, .22),
-    inset 0 1px 0 rgba(255, 255, 255, .15);
+    box-shadow: 0 10px 24px rgba(31, 38, 135, .18),
+    inset 0 2px 6px rgba(0, 0, 0, .12);
 
     color: black;
     font-family: var(--font-ui);
@@ -46,30 +29,37 @@
     cursor: grab;
     user-select: none;
 
-    transition: box-shadow .2s ease;
-
-    perspective: 1000px;
-    isolation: isolate;
+    transition: box-shadow .2s ease,
+    padding-left .3s cubic-bezier(.2, .8, .2, 1);
 
     isolation: isolate;
+}
 
+
+.SandBox.fechada {
+    padding-left: 34px;
 }
 
 .SandBox:active {
     cursor: grabbing;
 
-    box-shadow: 0 4px 16px rgba(31, 38, 135, .3),
-    inset 0 1px 0 rgba(255, 255, 255, .6);
+    box-shadow: 0 4px 14px rgba(31, 38, 135, .26),
+    inset 0 2px 6px rgba(0, 0, 0, .16);
 }
 
-.SandBox::before{
+/* ---------------------------------------------------------------------
+   CAPA — transição suave, sem o giro 3D
+   O antigo rotateX segue comentado abaixo. A capa entra com fade e um
+   leve deslize vertical, enquanto as fichas saem. Nada de tampa girando.
+   ------------------------------------------------------------------ */
+.SandBox::before {
     content: "";
 
     position: absolute;
     inset: 0;
 
     border-radius: inherit;
-    border: 1px solid rgba(255, 255, 255, .7);
+    border-left: 7px solid rgba(0, 0, 0, .18);
 
     background: linear-gradient(
             135deg,
@@ -79,36 +69,92 @@
 
     box-shadow:
             0 5px 15px rgba(0, 0, 0, .18),
-            inset 0 1px 3px rgba(255, 255, 255, .8);
+            inset 0 1px 3px rgba(255, 255, 255, .35);
 
+    /* transform-origin: top center; */
+    /* transform: rotateX(100deg); */
+    /* backface-visibility: hidden; */
+    /* transition: transform .7s cubic-bezier(.2, .75, .25, 1); */
 
+    transform: translateY(-12px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 12;
 
-    /* Ponto de articulação da tampa */
-    transform-origin: top center;
+    transition: opacity .3s ease,
+    transform .3s cubic-bezier(.2, .8, .2, 1),
+    visibility 0s linear .3s;
+}
 
-    /* Posição inicial: livro aberto */
-    transform: rotateX(100deg);
+.SandBox.fechada::before {
+    /* Antes: transform: rotateX(0deg); */
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    transition: opacity .3s ease,
+    transform .3s cubic-bezier(.2, .8, .2, 1),
+    visibility 0s;
+}
 
-    backface-visibility: hidden;
+/* Lombada: faixa de cartolina mais escura, só com a pasta fechada */
+.lombadaPasta {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 34px;
 
-    transition: transform .7s cubic-bezier(.2, .75, .25, 1);
+    border-radius: 13px 0 0 13px;
+    background: linear-gradient(90deg, rgba(0, 0, 0, .26), rgba(0, 0, 0, .06) 60%, rgba(255, 255, 255, .18));
+    box-shadow: inset -2px 0 4px rgba(0, 0, 0, .16);
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-100%);
+    transition: opacity .3s ease,
+    transform .3s cubic-bezier(.2, .8, .2, 1),
+    visibility 0s linear .3s;
 
     pointer-events: none;
-
-    z-index: 1;
-}
-.SandBox.fechada::before {
-    transform: rotateX(0deg);
+    z-index: 13;
 }
 
-@supports not (
-    (backdrop-filter: blur(1px)) or
-    (-webkit-backdrop-filter: blur(1px))
-) {
-    .SandBox {
-        background: rgba(255, 255, 255, .7);
-    }
+.SandBox.fechada .lombadaPasta {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    transition: opacity .3s ease,
+    transform .3s cubic-bezier(.2, .8, .2, 1),
+    visibility 0s;
 }
+
+/* Aba de identificação: fica acima da capa quando a pasta está fechada */
+.abaPasta {
+    position: absolute;
+    top: -13px;
+    right: 22px;
+    z-index: 15;
+
+    max-width: calc(100% - 70px);
+    padding: 5px 14px 6px;
+    box-sizing: border-box;
+
+    background: var(--cor-final, #769efd);
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+
+    font-size: .78rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    pointer-events: none;
+}
+
+/* Não existe mais backdrop-filter: o fallback de vidro foi removido. */
 
 /* =====================================================================
    CONTAINER DE DICA (ícone "+" + texto)
@@ -176,35 +222,23 @@
 
 /* =====================================================================
    ÁREA DAS MINIATURAS (div interna)
-   ---------------------------------------------------------------------
-   As miniaturas ficam lado a lado e quebram de linha quando faltar
-   espaço. A altura é automática, então a div cresce a cada miniatura
-   nova e empurra a SandBox junto.
+
    ===================================================================== */
 .miniaturasPasta {
     display: flex;
-    flex-wrap: wrap;          /* quebra de linha quando não couber */
+    flex-wrap: wrap;
     align-items: flex-start;
-    gap: 8px;                 /* espaço entre as miniaturas */
-
-    height: auto;             /* NUNCA colocar altura fixa aqui */
-
-    /* ROLAGEM: a rolagem fica aqui, e não na .SandBox.
-       - flex: 1 1 auto  -> ocupa o espaço disponível dentro da SandBox
-       - min-height: 0   -> deixa a div encolher abaixo do tamanho do
-                            conteúdo (sem isso o flex não deixa e não rola)
-       - overflow-y      -> aparece a barra quando as miniaturas não cabem */
+    gap: 8px;
+    height: auto;
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    align-content: flex-start; /* linhas ficam coladas no topo ao rolar */
+    align-content: flex-start;
 
-    touch-action: pan-y;       /* permite rolar com o dedo no celular
-                                  (a SandBox tem touch-action: none) */
+    touch-action: pan-y;
 }
 
-/* Barra de rolagem discreta, combinando com o visual de vidro */
 .miniaturasPasta::-webkit-scrollbar {
     width: 6px;
 }
@@ -218,63 +252,54 @@
 /* =====================================================================
    MINIATURA (botão com o nome da box guardada)
    ===================================================================== */
+
 .miniaturaPasta {
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
     max-width: 100%;
-    padding: 8px 12px;
+    padding: 0 2px 2px;
     box-sizing: border-box;
 
-    background: rgba(255, 255, 255, .65);
-    border: 1px solid rgba(255, 255, 255, .7);
-    border-radius: 12px;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px dashed rgba(0, 0, 0, .22);
+    border-radius: 0;
 
     color: #202020;
     font-size: .85rem;
-    font-weight: 500;
+    font-weight: 600;
     font-family: var(--font-ui);
 
     cursor: pointer;
     user-select: none;
     touch-action: manipulation;
 
-    overflow-wrap: anywhere;    /* quebra títulos muito longos */
+    overflow-wrap: anywhere;
 
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
     transition: opacity .25s ease,
     transform .25s ease,
+    border-color .18s ease,
     visibility 0s linear 0s;
 }
 
 .miniaturaPasta:hover {
-    background: rgba(255, 255, 255, .9);
-    transform: translateY(-2px); /* sobe um pouco ao passar o mouse */
+    border-bottom-color: rgba(0, 0, 0, .45);
 }
 
-
-/* =====================================================================
-   ARMAZENAMENTO (div que guarda as boxes de verdade)
-   ---------------------------------------------------------------------
-   Fica vazia visualmente: as boxes dentro dela ficam escondidas e só
-   aparecem quando a miniatura é clicada.
-   ===================================================================== */
 .armazenamentoPasta {
-    position: static; /* sem criar nova referência de posição: a box
-                         expandida se posiciona em relação à .SandBox */
+    position: static;
     height: auto;
 }
 
-/* Boxes guardadas: escondidas por padrão */
 .armazenamentoPasta .newBoxTable {
     display: none;
 }
 
-/* Box guardada que foi aberta ao clicar na miniatura:
-   aparece ao lado direito da SandBox */
 .armazenamentoPasta .newBoxTable.expandida {
    display: block;
    position: absolute;
@@ -294,49 +319,60 @@
    overflow:auto;
 }
 
-
-/* =====================================================================
-   PÍLULA DA MINIATURA (miniatura + botão de remover)
-   ---------------------------------------------------------------------
-   <div class="botoesMiniatura">
-       <button class="miniaturaPasta">...</button>
-       <button class="botaoRemoverMiniatura">x</button>
-   </div>
-   ===================================================================== */
 .botoesMiniatura {
+    position: relative;
+
     display: inline-flex;
     align-items: center;
     gap: 6px;
 
     max-width: 100%;
-    padding: 4px 6px 4px 12px;
+    min-height: 46px;
+    padding: 8px 10px;
     box-sizing: border-box;
 
-    background: rgba(255, 255, 255, .65);
-    border: 1px solid rgba(255, 255, 255, .7);
-    border-radius: 999px;     /* formato de pílula */
+    background: linear-gradient(180deg, #fffdf5, #f1ead6);
+    border: 1px solid rgba(0, 0, 0, .18);
+    border-left: 4px solid rgba(0, 0, 0, .08);
+    border-radius: 3px;
 
-    transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, .10), 0 5px 10px rgba(0, 0, 0, .10);
+
+    transition: opacity .28s ease,
+    transform .28s ease,
+    box-shadow .18s ease,
+    visibility 0s linear 0s;
 }
 
 .botoesMiniatura:hover {
-    background: rgba(255, 255, 255, .92);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(31, 38, 135, .18);
+    box-shadow: 0 3px 0 rgba(0, 0, 0, .10), 0 8px 14px rgba(0, 0, 0, .14);
 }
 
-/* Dentro da pílula, o botão da miniatura perde o visual próprio
-   (fundo, borda e efeito de hover), porque quem desenha é a pílula */
+/* Ao fechar, a ficha inteira sai junto com a capa */
+.SandBox.fechada .botoesMiniatura {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: opacity .28s ease,
+    transform .28s ease,
+    visibility 0s linear .28s;
+}
+
+/* Dentro da ficha, o botão da miniatura mantém só a linha do campo */
 .botoesMiniatura .miniaturaPasta {
-    padding: 0;
+    padding: 0 2px 2px;
     background: none;
     border: 0;
+
     border-radius: 0;
     transform: none;
 }
 
 .botoesMiniatura .miniaturaPasta:hover {
     background: none;
+    border-bottom-color: rgba(0, 0, 0, .45);
     transform: none;
 }
 
@@ -415,7 +451,7 @@
 
 .inputNomePasta {
     position: absolute;
-    z-index: 2;
+    z-index: 14; /* acima da capa (12) e da lombada (13) */
     top: 35%;
     left: 12%;
     right: 50px;
@@ -429,6 +465,25 @@
     outline: none;
     text-align: center;
     -webkit-appearance: none;
+
+    /* Entra logo após a capa, junto com a transição da pasta */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px);
+    pointer-events: none;
+    transition: opacity .3s ease .08s,
+    transform .3s ease .08s,
+    visibility 0s linear .38s;
+}
+
+.inputNomePasta.visivel {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition: opacity .3s ease .08s,
+    transform .3s ease .08s,
+    visibility 0s;
 }
 
 .inputNomePasta:focus,

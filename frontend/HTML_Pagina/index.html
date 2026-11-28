@@ -305,8 +305,17 @@
         <div class="newBoxTable">
             <div class="tituloNovaBox">
                 <label class="boxNewNome">
-                    <input type="text" value="WorkTable" class="inputDoTituloNovaBox">
+                    <!-- name/autocomplete próprios: não compartilha autofill com o participante -->
+                    <input type="text" value="WorkTable" class="inputDoTituloNovaBox" aria-label="Nome da BoxTable"
+                           name="titulo-box" autocomplete="off">
                 </label>
+
+                <span class="contadorDeTarefas" title="Tarefas concluídas">2/5</span>
+
+                <button type="button" class="buttonRemoverNewBox" aria-label="Remover BoxTable">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                         stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
             </div>
 
             <div class="TituloNovaBoxTarefa">
@@ -315,20 +324,15 @@
                 <button type="button" class="buttonCreateBox"></button>
             </div>
 
-            <div>
-                <button type="button" class="buttonRemoverNewBox">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="10" height="10">
-                        <path d="M504.6 148.5C515.9 134.9 514.1 114.7 500.5 103.4C486.9 92.1 466.7 93.9 455.4 107.5L320 270L184.6 107.5C173.3 93.9 153.1 92.1 139.5 103.4C125.9 114.7 124.1 134.9 135.4 148.5L278.3 320L135.4 491.5C124.1 505.1 125.9 525.3 139.5 536.6C153.1 547.9 173.3 546.1 184.6 532.5L320 370L455.4 532.5C466.7 546.1 486.9 547.9 500.5 536.6C514.1 525.3 515.9 505.1 504.6 491.5L361.7 320L504.6 148.5z"/>
-                    </svg>
-                </button>
-            </div>
-
             <ul class="newListaDeTarefasTemplate" id="liTarefas"></ul>
         </div>
     </template>
 
     <template id="boxTransparente">
         <div class="SandBox">
+            <div class="lombadaPasta" aria-hidden="true"></div>
+            <div class="abaPasta" aria-hidden="true"><span class="abaTexto">Fichário</span></div>
+
             <div class="dicaContainer">
                 <span class="dicaIcone">+</span>
             </div>
@@ -341,7 +345,6 @@
 
 <script src="Scripts/task-manager.js"></script>
 <script src="Scripts/box-interactions.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13"></script>
 <script src="Scripts/box-factory.js"></script>
 <script src="Scripts/welcome-animation.js"></script>
 <script src="Scripts/auth-dialog.js"></script>

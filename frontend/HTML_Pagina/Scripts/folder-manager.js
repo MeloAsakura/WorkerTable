@@ -596,6 +596,16 @@ function pulsoDbClick(x, y) {
 }
 
 
+ /* =====================================================================
+    PASTA DE FICHÁRIO — o que foi feito aqui
+    ---------------------------------------------------------------------
+    - A aba .abaTexto passa a mostrar o mesmo nome digitado na capa;
+      antes o nome só existia no input central da pasta fechada.
+    - O duplo clique continua sendo o gesto de abrir/fechar; aqui só
+      alternamos .fechada e a classe .visivel do nome. A capa, as fichas
+      e o nome fazem a transição suave no CSS (fade + leve deslize).
+    - As fichas (.botoesMiniatura) continuam clicáveis e removíveis.
+    ===================================================================== */
  function creationPaste() {
      document.addEventListener('dblclick', (e) => {
          if (e.target.closest('.miniaturaPasta,.newBoxTable, button')) return;
@@ -613,6 +623,15 @@ function pulsoDbClick(x, y) {
 
          const fechada = p.classList.toggle('fechada');
 
+         // Aba de identificação acompanha o nome da pasta
+         const abaTexto = p.querySelector('.abaTexto');
+         if (abaTexto) {
+             if (!abaTexto.textContent.trim()) {
+                 abaTexto.textContent = p.dataset.nomePasta || 'Fichário';
+             }
+             colorText(abaTexto, p);
+         }
+
          let inputNomePasta = p.querySelector('.inputNomePasta');
          if(!inputNomePasta){
 
@@ -623,11 +642,15 @@ function pulsoDbClick(x, y) {
 
              inputNomePasta.addEventListener('input', () => {
                  p.dataset.nomePasta = inputNomePasta.value
+                 if (abaTexto) {
+                     abaTexto.textContent = inputNomePasta.value.trim() || 'Fichário'
+                 }
              })
          }
          p.append(inputNomePasta);
 
-         inputNomePasta.style.display=fechada ? 'block' : 'none';
+         // Classe em vez de display: permite fade do nome junto com a capa
+         inputNomePasta.classList.toggle('visivel', fechada);
          colorText(inputNomePasta,p)
 
          miniaturas.forEach((m) => {

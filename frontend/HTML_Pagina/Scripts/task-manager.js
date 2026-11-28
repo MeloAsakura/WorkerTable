@@ -191,18 +191,16 @@ function atualizarResumoDatas(elementos) {
 function configurarParticipantes(elementos) {
     const {buttonParticipantes,li} = elementos
 
-
-
     function divDeParticipantes() {
         const createDivParticipante = document.createElement('div')
         const inputParticipantes = inputParticipante()
+        const inputEmails = inputEmailParticipante()
 
         createDivParticipante.append(inputParticipantes)
+        if(inputParticipantes){
+            createDivParticipante.append(inputEmails)
+        }
         createDivParticipante.classList.add('participantes');
-        createDivParticipante.style.background = 'black';
-        createDivParticipante.style.width = '20px';
-        createDivParticipante.style.height = '20px';
-
         li.append(createDivParticipante);
 
     }
@@ -210,16 +208,34 @@ function configurarParticipantes(elementos) {
     function inputParticipante() {
         const inputParticipantes = document.createElement('input');
         inputParticipantes.classList.add('inputParticipantes');
+        inputParticipantes.type = 'text';
+        // name + autocomplete explícitos: o navegador não confunde este
+        // campo com o título da box e não preenche os dois juntos
+        inputParticipantes.name = 'participante-nome';
+        inputParticipantes.autocomplete = 'off';
+        inputParticipantes.placeholder = 'Nome do participante';
+        inputParticipantes.setAttribute('aria-label', 'Nome do participante');
 
         return inputParticipantes
     }
+
+    function inputEmailParticipante(){
+        const inputEmailParticantes = document.createElement('input');
+        inputEmailParticantes.classList.add('inputEmailParticipante');
+        inputEmailParticantes.type = 'email';
+        inputEmailParticantes.name = 'participante-email';
+        inputEmailParticantes.autocomplete = 'email';
+        inputEmailParticantes.placeholder = 'Email do participante';
+
+        return inputEmailParticantes;
+    }
+
+
 
     buttonParticipantes.addEventListener('click',divDeParticipantes)
 
 
 }
-
-
 
 
 //============================TIMER=========================//

@@ -26,33 +26,42 @@
 
 .newBoxTable .tituloNovaBox {
     flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
     margin-bottom: 18px;
 }
 
 .newBoxTable .boxNewNome {
-    display: block;
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .newBoxTable .inputDoTituloNovaBox {
-    width: calc(100% + 20px);
+    flex: 1 1 auto;
+    width: auto;
     min-width: 0;
-    margin-left: -10px;
+    margin-left: 0;
     padding: 6px 10px;
     border: none;
     border-radius: 10px;
     outline: none;
     background: transparent;
     color: var(--cor-texto);
-    font-size: 1.45rem;
+    font-size: 1.15rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -.01em;
-    text-align: center;
+    text-align: left;
     text-overflow: ellipsis;
-    transform: translateY(-6px);
+    transform: none;
     box-sizing: border-box;
-    transition: background-color .15s ease;
-
+    transition: background-color 0.2s ease;
+}
+.newBoxTable .inputDoTituloNovaBox:hover {
+    background: rgba(230, 230, 230, 0.95);
 }
 
 .newBoxTable.comGuia .tituloNovaBox {
@@ -62,34 +71,47 @@
 }
 
 .newBoxTable.comGuia .inputDoTituloNovaBox {
-    width: 100%;
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
     box-sizing: border-box;
     margin-left: 0;
+}
+
+.newBoxTable .contadorDeTarefas {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+    display: flex;
+    align-items: center;
+    flex: none;
+    font-size: 0.65rem;
+    white-space: nowrap;
 }
 
 /*==================== Botão de remover o box ====================*/
 
 .buttonRemoverNewBox {
-    flex-shrink: 0;
+    flex: none;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 25px;
     height: 25px;
-    margin: 15px auto 0;
-    border: 1px solid grey;
-    border-radius: 12px;
+    margin: 0;
+    border: none;
+    border-radius:10px;
     background: transparent;
     cursor: pointer;
     transition: background-color .2s ease-in-out;
 }
 
 .buttonRemoverNewBox:hover {
-    background-color: var(--cor-perigo);
+    background: rgba(226, 100, 90, 0.35);
+    fill:#ffffff
 }
 
 .buttonRemoverNewBox svg {
     pointer-events: none;
+    align-items: center;
 }
 
 /*==================== Campo para criar tarefa ====================*/
@@ -459,10 +481,6 @@
     transition: color .15s ease, background-color .15s ease;
 }
 
-/* OPÇÃO 2: Botão timer mostrando o tempo do pomodoro (miniatura inline) */
-/* COMO FOI FEITO: Quando a classe .pomodoroAtivo é adicionada ao buttonTimer,
-   o botão muda de cor para destacar que o timer está ativo e o tempo é exibido
-   ao lado do ícone do relógio, dentro do próprio botão. */
 .containerTimer .buttonTimer.pomodoroAtivo {
     color: var(--cor-primaria, #0891b2);
     background: var(--cor-primaria-suave, rgba(8, 145, 178, .08));
@@ -474,10 +492,6 @@
 .containerTimer .buttonTimer.pomodoroAtivo:hover {
     background: var(--cor-primaria-suave, rgba(8, 145, 178, .15));
 }
-
-/* OPÇÃO 2: O span com o tempo formatado dentro do botão */
-/* COMO FOI FEITO: Classe aplicada ao <span> criado dinamicamente com o tempo "MM:SS"
-   para garantir fonte monoespaçada (números alinhados) e evitar que quebre a linha. */
 .tempoMiniatura {
     font-family: 'Space Grotesk', monospace;
     white-space: nowrap;
@@ -958,6 +972,17 @@
 .newBoxTable .descricaoNotes {
     width: 100%;
     margin-top: 10px;
+}
+
+
+
+/*====================Caixa de Participantes====================*/
+.newBoxTable.participantes{
+    width: 100%;
+}
+
+.newBoxTable .inputParticipantes {
+    width: 100%;
 }
 
 /*==================== Atributo hidden ====================*/
