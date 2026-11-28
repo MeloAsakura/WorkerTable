@@ -192,29 +192,35 @@ function configurarParticipantes(elementos) {
     const {buttonParticipantes,li} = elementos
 
     function divDeParticipantes() {
+        if (li.querySelector('.participantes')) return;
+
         const createDivParticipante = document.createElement('div')
         const inputParticipantes = inputParticipante()
         const inputEmails = inputEmailParticipante()
+        const cont=contadorParticipantes()
 
-        createDivParticipante.append(inputParticipantes)
-        if(inputParticipantes){
-            createDivParticipante.append(inputEmails)
-        }
+        createDivParticipante.append(inputParticipantes, inputEmails)
         createDivParticipante.classList.add('participantes');
-        li.append(createDivParticipante);
+        li.append(createDivParticipante,cont);
 
+    }
+
+    function impedirAutofill(input) {
+        input.autocomplete = 'new-password';
+        input.setAttribute('data-form-type', 'other');
+        input.setAttribute('data-lpignore', 'true');
+        input.setAttribute('data-1p-ignore', '');
+        input.setAttribute('data-bwignore', 'true');
     }
 
     function inputParticipante() {
         const inputParticipantes = document.createElement('input');
         inputParticipantes.classList.add('inputParticipantes');
         inputParticipantes.type = 'text';
-        // name + autocomplete explícitos: o navegador não confunde este
-        // campo com o título da box e não preenche os dois juntos
         inputParticipantes.name = 'participante-nome';
-        inputParticipantes.autocomplete = 'off';
         inputParticipantes.placeholder = 'Nome do participante';
         inputParticipantes.setAttribute('aria-label', 'Nome do participante');
+        impedirAutofill(inputParticipantes);
 
         return inputParticipantes
     }
@@ -224,15 +230,33 @@ function configurarParticipantes(elementos) {
         inputEmailParticantes.classList.add('inputEmailParticipante');
         inputEmailParticantes.type = 'email';
         inputEmailParticantes.name = 'participante-email';
-        inputEmailParticantes.autocomplete = 'email';
+        inputEmailParticantes.required = true;
         inputEmailParticantes.placeholder = 'Email do participante';
+        inputEmailParticantes.setAttribute('aria-label', 'Email do participante');
+        impedirAutofill(inputEmailParticantes);
 
         return inputEmailParticantes;
     }
 
+    function contadorParticipantes(){
+        const contadorPart = document.createElement('span')
+        contadorPart.classList.add('contadorPart')
+        contadorPart.text='1'
+        contadorPart.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="8" r="4"></circle>
+                                <path d="M4 21a8 8 0 0 1 16 0"></path>
+                            </svg>
+       <span class="contadorNum">1</span>`;
 
+        return contadorPart
+    }
+    let cont=0
+    buttonParticipantes.addEventListener('click',()=>{
+        let contadorSpan=document.querySelector('.contadorNum')
+        cont++;
+        contadorSpan.textContent=cont;
 
-    buttonParticipantes.addEventListener('click',divDeParticipantes)
+    })
 
 
 }

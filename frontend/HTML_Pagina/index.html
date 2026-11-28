@@ -305,9 +305,9 @@
         <div class="newBoxTable">
             <div class="tituloNovaBox">
                 <label class="boxNewNome">
-                    <!-- name/autocomplete próprios: não compartilha autofill com o participante -->
                     <input type="text" value="WorkTable" class="inputDoTituloNovaBox" aria-label="Nome da BoxTable"
-                           name="titulo-box" autocomplete="off">
+                           name="titulo-box" autocomplete="new-password"
+                           data-form-type="other" data-lpignore="true" data-1p-ignore data-bwignore="true">
                 </label>
 
                 <span class="contadorDeTarefas" title="Tarefas concluídas">2/5</span>
@@ -320,7 +320,7 @@
 
             <div class="TituloNovaBoxTarefa">
                 <label class="nomeNovaBoxTarefa"></label>
-                <input type="text" value="Nova Tarefa" class="inputNomeNovaBoxTarefa" required>
+                <input type="text" value="Nova Tarefa" class="inputNomeNovaBoxTarefa" autocomplete="off" required>
                 <button type="button" class="buttonCreateBox"></button>
             </div>
 

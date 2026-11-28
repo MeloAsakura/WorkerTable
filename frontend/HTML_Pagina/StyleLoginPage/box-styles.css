@@ -977,12 +977,58 @@
 
 
 /*====================Caixa de Participantes====================*/
-.newBoxTable.participantes{
+.newBoxTable .participantes {
+    display: flex;
+    flex-direction: column;
+    border: solid 1px cornflowerblue;
+    border-radius: 10px;
+    padding: 2px;
     width: 100%;
 }
 
-.newBoxTable .inputParticipantes {
+.newBoxTable .inputParticipantes,
+.newBoxTable .inputEmailParticipante {
+    box-sizing: border-box;
     width: 100%;
+    min-width: 0;
+    height: 40px;
+    padding: 0 10px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    background: var(--cor-campo);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9),
+    0 1px 2px rgba(27, 36, 51, .04);
+    color: var(--cor-texto);
+    font-family: inherit;
+    font-size: .82rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .01em;
+    cursor: text;
+    outline: none;
+    transition: border-color .18s ease, background-color .18s ease,
+    box-shadow .18s ease;
+}
+
+.newBoxTable .inputParticipantes::placeholder,
+.newBoxTable .inputEmailParticipante::placeholder {
+    color: var(--cor-texto-suave);
+    font-weight: 400;
+}
+
+/* Mesmo hover do campo de descrição */
+.newBoxTable .inputParticipantes:hover,
+.newBoxTable .inputEmailParticipante:hover {
+    border-color: rgba(47, 84, 184, .35);
+    background: #fff;
+}
+
+/* Mesmo foco do campo de descrição */
+.newBoxTable .inputParticipantes:focus,
+.newBoxTable .inputEmailParticipante:focus {
+    border-color: var(--cor-primaria);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(47, 84, 184, .14);
 }
 
 /*==================== Atributo hidden ====================*/
